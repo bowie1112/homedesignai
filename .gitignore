@@ -1,0 +1,14 @@
+node_modules
+.pnpm-store
+.next
+.vercel
+coverage
+playwright-report
+test-results
+.env
+.env.local
+*.tsbuildinfo
+.DS_Store
+toolify-ai-interior-design-names.txt
+toolify-ai-interior-design-tools.csv
+toolify-ai-interior-design-tools.json
