@@ -18,19 +18,19 @@ describe("KIE Nano Banana adapter", () => {
     process.env.NEXT_PUBLIC_APP_URL = "https://home.example";
   });
 
-  it("maps Basic to Lite and omits image_urls for text-to-image", () => {
+  it("maps Basic to the documented 1K model and omits image_input for text-to-image", () => {
     const payload = buildKiePayload({ ...baseInput, tool: "floor-plan-generator" }, []);
-    expect(payload.model).toBe("nano-banana-2-lite");
+    expect(payload.model).toBe("nano-banana-2");
     expect(payload.callBackUrl).toBe("https://home.example/api/webhooks/kie");
-    expect(payload.input).not.toHaveProperty("image_urls");
-    expect(payload.input).toMatchObject({ aspect_ratio: "4:3" });
+    expect(payload.input).not.toHaveProperty("image_input");
+    expect(payload.input).toMatchObject({ aspect_ratio: "4:3", resolution: "1K", output_format: "jpg" });
   });
 
-  it("maps Lite references to image_urls and caps them at 10", () => {
+  it("maps Basic references to image_input and caps them at 10", () => {
     const urls = Array.from({ length: 12 }, (_, index) => `https://example.com/${index}.png`);
     const payload = buildKiePayload(baseInput, urls);
-    expect(payload.input).toHaveProperty("image_urls");
-    expect((payload.input as { image_urls: string[] }).image_urls).toHaveLength(10);
+    expect(payload.input).toHaveProperty("image_input");
+    expect((payload.input as { image_input: string[] }).image_input).toHaveLength(10);
   });
 
   it("maps Pro references to image_input with fixed 2K output", () => {

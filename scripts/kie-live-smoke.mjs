@@ -38,8 +38,8 @@ async function waitForTask(taskId) {
 
 const prompt = "An original calm contemporary living room with pale oak, limestone, cream linen, realistic daylight, no people, no text, no logos, no watermark.";
 const cases = [
-  ["basic-text", "nano-banana-2-lite", { prompt, aspect_ratio: "4:3" }],
-  ["basic-image", "nano-banana-2-lite", { prompt: `${prompt} Preserve the uploaded room geometry and camera position.`, aspect_ratio: "4:3", image_urls: [imageUrl] }],
+  ["basic-text", "nano-banana-2", { prompt, aspect_ratio: "4:3", resolution: "1K", output_format: "jpg" }],
+  ["basic-image", "nano-banana-2", { prompt: `${prompt} Preserve the uploaded room geometry and camera position.`, aspect_ratio: "4:3", image_input: [imageUrl], resolution: "1K", output_format: "jpg" }],
   ["pro-text", "nano-banana-2", { prompt, aspect_ratio: "4:3", resolution: "2K", output_format: "jpg" }],
   ["pro-image", "nano-banana-2", { prompt: `${prompt} Preserve the uploaded room geometry and camera position.`, aspect_ratio: "4:3", image_input: [imageUrl], resolution: "2K", output_format: "jpg" }],
 ];

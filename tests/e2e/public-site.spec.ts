@@ -31,6 +31,7 @@ test("reference upload validates and previews locally", async ({ page }) => {
 test("sign-in page and OAuth failure recovery remain reachable", async ({ page }) => {
   await page.goto("/auth/sign-in");
   await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Create account" })).toBeVisible();
   await page.goto("/auth/callback");
   await expect(page).toHaveURL(/\/auth\/sign-in\?error=oauth/);
   await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();

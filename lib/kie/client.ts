@@ -41,9 +41,9 @@ export function buildKiePayload(input: GenerationInput, signedInputUrls: string[
 
   if (input.tier === "basic") {
     return {
-      model: "nano-banana-2-lite",
+      model: "nano-banana-2",
       callBackUrl: `${getAppUrl()}/api/webhooks/kie`,
-      input: signedInputUrls.length ? { ...common, image_urls: signedInputUrls.slice(0, 10) } : common,
+      input: signedInputUrls.length ? { ...common, image_input: signedInputUrls.slice(0, 10), resolution: "1K", output_format: "jpg" } : { ...common, resolution: "1K", output_format: "jpg" },
     };
   }
 

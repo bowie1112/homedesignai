@@ -150,6 +150,9 @@ $$;
 
 create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();
 
+revoke all on function public.handle_new_user() from public, anon, authenticated;
+revoke all on function public.set_updated_at() from public, anon, authenticated;
+
 create or replace function public.reserve_credits_and_create_job(
   p_user_id uuid,
   p_job_id uuid,
@@ -263,6 +266,10 @@ revoke all on function public.grant_credits(uuid, integer, text, text) from publ
 grant execute on function public.reserve_credits_and_create_job(uuid, uuid, text, text, text, uuid[], text, text, text, integer) to service_role;
 grant execute on function public.refund_generation_job(uuid, text) to service_role;
 grant execute on function public.grant_credits(uuid, integer, text, text) to service_role;
+
+grant usage on schema public to authenticated, service_role;
+grant select on public.profiles, public.credit_accounts, public.credit_transactions, public.assets, public.generation_jobs, public.subscriptions, public.orders to authenticated;
+grant all on public.profiles, public.credit_accounts, public.credit_transactions, public.assets, public.generation_jobs, public.subscriptions, public.orders, public.webhook_events to service_role;
 
 alter table public.profiles enable row level security;
 alter table public.credit_accounts enable row level security;

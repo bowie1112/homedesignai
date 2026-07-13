@@ -222,6 +222,7 @@ button:disabled {
 }
 
 .field,
+.text-field,
 .select-field {
   width: 100%;
   border: 1px solid var(--line);
@@ -236,6 +237,11 @@ button:disabled {
   resize: vertical;
 }
 
+.text-field {
+  min-height: 46px;
+  padding: 0 13px;
+}
+
 .select-field {
   min-height: 46px;
   padding: 0 42px 0 13px;
@@ -245,12 +251,18 @@ button:disabled {
   color: oklch(52% 0.02 257);
 }
 
+.text-field::placeholder {
+  color: oklch(52% 0.02 257);
+}
+
 .field:hover,
+.text-field:hover,
 .select-field:hover {
   border-color: var(--line-strong);
 }
 
 .field:focus,
+.text-field:focus,
 .select-field:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 3px oklch(64% 0.17 257 / 0.18);

@@ -19,7 +19,7 @@ Production-oriented MVP for AI floor plans and home-design concept images. Built
 
 ## Provider behavior
 
-- Basic: `nano-banana-2-lite`, 1 site credit.
+- Basic: `nano-banana-2` at 1K, 1 site credit.
 - Pro: `nano-banana-2`, fixed 2K, 3 site credits.
 - The browser uploads input images directly to a short-lived Supabase signed upload URL, avoiding Vercel request-size limits. Inputs and final results live in the private `private-assets` bucket.
 - KIE callbacks are verified and treated as signals. Final state is confirmed with `recordInfo`.
