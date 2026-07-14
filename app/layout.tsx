@@ -46,6 +46,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        <script defer data-domain="homedesignai.co" src="http://43.163.88.44:8000/js/script.js" />
+      </head>
       <body>
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`} strategy="afterInteractive" />
         <Script id="google-tag" strategy="afterInteractive">
