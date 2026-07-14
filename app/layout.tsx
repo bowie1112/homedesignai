@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "@fontsource-variable/instrument-sans";
 import "./globals.css";
 import { SiteFooter } from "@/components/site-footer";
@@ -6,11 +7,13 @@ import { SiteHeader } from "@/components/site-header";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const googleTagId = "G-RJZBHM75CQ";
+const socialTitle = "AI Home Design — Interior, Exterior & Room Design";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: `${SITE_NAME} — Floor Plans and Interior Concepts`,
+    default: `${SITE_NAME} — Interior, Exterior & Room Design`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -18,13 +21,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    title: SITE_NAME,
+    url: "/",
+    siteName: SITE_NAME,
+    title: socialTitle,
     description: SITE_DESCRIPTION,
     images: [{ url: "/images/hero-interior.webp", width: 1536, height: 1024 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
+    title: socialTitle,
     description: SITE_DESCRIPTION,
     images: ["/images/hero-interior.webp"],
   },
@@ -42,6 +47,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`} strategy="afterInteractive" />
+        <Script id="google-tag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${googleTagId}');
+          `}
+        </Script>
         <a className="skip-link" href="#main-content">
           Skip to main content
         </a>
