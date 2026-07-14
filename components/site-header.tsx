@@ -6,11 +6,39 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandMark } from "@/components/brand-mark";
 import { navGroups } from "@/lib/site";
+import { createClient } from "@/lib/supabase/client";
+
+function AccountLink({ mobile = false, signedIn }: { mobile?: boolean; signedIn: boolean | null }) {
+  if (signedIn === null) return <span aria-hidden="true" className={mobile ? "h-11" : "h-10 w-16"} />;
+  return <Link className={mobile ? "button-ghost" : "button-ghost px-3 text-sm"} href={signedIn ? "/account" : "/auth/sign-in"}>{signedIn ? "Account" : "Sign in"}</Link>;
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    try {
+      const supabase = createClient();
+      let active = true;
+      void supabase.auth.getSession().then(({ data }) => {
+        if (active) setSignedIn(Boolean(data.session));
+      }).catch(() => {
+        if (active) setSignedIn(false);
+      });
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (active) setSignedIn(Boolean(session));
+      });
+      return () => {
+        active = false;
+        subscription.unsubscribe();
+      };
+    } catch {
+      setSignedIn(false);
+    }
+  }, []);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -79,7 +107,7 @@ export function SiteHeader() {
             <Link className="button-ghost px-3 text-sm" href="/pricing">Pricing</Link>
           </nav>
           <div className="hidden items-center gap-2 lg:flex">
-            <Link className="button-ghost px-3 text-sm" href="/auth/sign-in">Sign in</Link>
+            <AccountLink signedIn={signedIn} />
             <Link className="button-primary min-h-10 px-4 text-sm" href="/interior-design-ai">Create a design</Link>
           </div>
           <button
@@ -119,7 +147,7 @@ export function SiteHeader() {
         <div className="grid gap-2 pt-5">
           <Link className="button-secondary" href="/pricing">View pricing</Link>
           <Link className="button-primary" href="/interior-design-ai">Create a design</Link>
-          <Link className="button-ghost" href="/auth/sign-in">Sign in</Link>
+          <AccountLink mobile signedIn={signedIn} />
         </div>
       </aside>
     </>

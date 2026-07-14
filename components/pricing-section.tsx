@@ -5,7 +5,7 @@ import { formatUsd, paymentPlans } from "@/lib/payments/plans";
 
 const plans = [paymentPlans.starter, paymentPlans.pro];
 
-export function PricingSection({ compact = false }: { compact?: boolean }) {
+export function PricingSection({ authenticated = false, compact = false }: { authenticated?: boolean; compact?: boolean }) {
   return (
     <section className={compact ? "" : "content-auto bg-[var(--ink)] py-20 text-[var(--paper)] sm:py-28"} id="pricing">
       <div className={compact ? "" : "site-shell"}>
@@ -35,7 +35,7 @@ export function PricingSection({ compact = false }: { compact?: boolean }) {
                 </ul>
                 <div className="mt-8">
                   {compact ? (
-                    <BillingButton planId={plan.id} variant={plan.featured ? "primary" : "secondary"}>Choose {plan.id === "starter" ? "Starter" : "Pro"}</BillingButton>
+                    <BillingButton authenticated={authenticated} planId={plan.id} variant={plan.featured ? "primary" : "secondary"}>Choose {plan.id === "starter" ? "Starter" : "Pro"}</BillingButton>
                   ) : (
                     <Link className={`w-full ${plan.featured ? "button-secondary border-white bg-white text-[var(--blue-deep)]" : "button-primary"}`} href={`/pricing?plan=${plan.id}`}>
                       Choose {plan.id === "starter" ? "Starter" : "Pro"} <MoveRight size={16} />

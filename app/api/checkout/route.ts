@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
 import { z } from "zod";
 import { getAppUrl, ConfigurationError } from "@/lib/env";
 import { paymentPlanIds, paymentPlans } from "@/lib/payments/plans";
@@ -84,8 +85,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (cause) {
-    if (orderId) await createAdminClient().from("orders").update({ status: "failed" }).eq("id", orderId);
+    console.error("Checkout creation failed.", { cause, orderId });
+    if (orderId) {
+      const { error } = await createAdminClient().from("orders").update({ status: "failed" }).eq("id", orderId);
+      if (error) console.error("Failed to mark checkout order as failed.", { error, orderId });
+    }
     if (cause instanceof ConfigurationError) return NextResponse.json({ message: "Stripe checkout is not configured yet." }, { status: 503 });
-    return NextResponse.json({ message: cause instanceof Error ? cause.message : "Checkout could not be created." }, { status: 400 });
+    if (cause instanceof z.ZodError) return NextResponse.json({ message: "Choose a valid plan before opening checkout." }, { status: 400 });
+    if (cause instanceof Stripe.errors.StripeError) return NextResponse.json({ message: "Secure checkout is temporarily unavailable. Please try again." }, { status: 502 });
+    return NextResponse.json({ message: "Checkout could not be created. Please try again." }, { status: 500 });
   }
 }

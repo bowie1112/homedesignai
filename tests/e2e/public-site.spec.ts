@@ -67,3 +67,31 @@ test("sign-in page and OAuth failure recovery remain reachable", async ({ page }
   await expect(page).toHaveURL(/\/auth\/sign-in\?error=oauth/);
   await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
 });
+
+test("signed-out purchase choices go to sign-in without calling checkout", async ({ page }) => {
+  const choices = [
+    { name: "Choose Starter", plan: "starter" },
+    { name: "Choose Pro", plan: "pro" },
+    { name: "Buy 40 credits", plan: "pack_40" },
+    { name: "Buy 120 credits", plan: "pack_120" },
+    { name: "Buy 300 credits", plan: "pack_300" },
+  ];
+  let checkoutRequests = 0;
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/api/checkout") checkoutRequests += 1;
+  });
+
+  for (const choice of choices) {
+    await page.goto("/pricing");
+    await page.getByRole("button", { name: choice.name, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/auth/sign-in\\?next=.*${choice.plan}`));
+  }
+
+  expect(checkoutRequests).toBe(0);
+});
+
+test("signed-out account renders billing guidance instead of the Stripe portal", async ({ page }) => {
+  await page.goto("/account");
+  await expect(page.getByText("Sign in before purchasing credits or managing billing.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Manage billing" })).toHaveCount(0);
+});

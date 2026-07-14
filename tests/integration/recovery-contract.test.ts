@@ -8,6 +8,8 @@ const kieWebhook = read("app/api/webhooks/kie/route.ts");
 const reconciliation = read("app/api/cron/reconcile-kie/route.ts");
 const stripeWebhook = read("app/api/webhooks/stripe/route.ts");
 const checkout = read("app/api/checkout/route.ts");
+const billingButton = read("components/billing-button.tsx");
+const accountPage = read("app/account/page.tsx");
 const plans = read("lib/payments/plans.ts");
 const sitemap = read("app/sitemap.ts");
 
@@ -51,6 +53,16 @@ describe("durable recovery integration contracts", () => {
     expect(checkout).toContain("z.object({ planId:");
     expect(checkout).not.toContain("priceEnv");
     expect(plans).toContain("creditsPerInvoice");
+  });
+
+  it("keeps authentication and empty billing states ahead of Stripe calls", () => {
+    expect(checkout).toContain('status: 401');
+    expect(checkout).toContain('cause instanceof z.ZodError');
+    expect(checkout).not.toContain('cause instanceof Error ? cause.message');
+    expect(billingButton).toContain('if (!authenticated)');
+    expect(billingButton).toContain('response.status === 401');
+    expect(accountPage).toContain('select("stripe_customer_id")');
+    expect(accountPage).toContain('Billing management becomes available after your first plan or credit purchase.');
   });
 
   it("keeps deferred native editing and DXF routes out of the public sitemap", () => {

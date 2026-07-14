@@ -24,7 +24,7 @@ const copy: Record<AuthMode, { title: string; description: string; action: strin
   },
 };
 
-export function SignInCard() {
+export function SignInCard({ nextPath = "/account" }: { nextPath?: string }) {
   const [mode, setMode] = useState<AuthMode>("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,7 +46,7 @@ export function SignInCard() {
       const supabase = createClient();
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${window.location.origin}/auth/callback?next=/account` },
+        options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}` },
       });
       if (authError) throw authError;
     } catch (cause) {
@@ -65,14 +65,14 @@ export function SignInCard() {
       if (mode === "sign-in") {
         const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
         if (authError) throw authError;
-        window.location.assign("/account");
+        window.location.assign(nextPath);
         return;
       }
       if (mode === "sign-up") {
         const { error: authError } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/account` },
+          options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}` },
         });
         if (authError) throw authError;
         setSuccess("Check your inbox to verify your email, then return here to sign in.");

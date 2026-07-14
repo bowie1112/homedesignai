@@ -4,11 +4,18 @@ import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import type { PaymentPlanId } from "@/lib/payments/plans";
 
-export function BillingButton({ planId, children, variant = "primary" }: { planId: PaymentPlanId; children: React.ReactNode; variant?: "primary" | "secondary" }) {
+export function BillingButton({ authenticated, planId, children, variant = "primary" }: { authenticated: boolean; planId: PaymentPlanId; children: React.ReactNode; variant?: "primary" | "secondary" }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const checkout = async () => {
+    const returnPath = `/pricing?plan=${encodeURIComponent(planId)}`;
+    const signInPath = `/auth/sign-in?next=${encodeURIComponent(returnPath)}`;
+    if (!authenticated) {
+      window.location.assign(signInPath);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -17,7 +24,11 @@ export function BillingButton({ planId, children, variant = "primary" }: { planI
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ planId }),
       });
-      const payload = (await response.json()) as { url?: string; message?: string };
+      const payload = await response.json().catch(() => ({})) as { url?: string; message?: string };
+      if (response.status === 401) {
+        window.location.assign(signInPath);
+        return;
+      }
       if (!response.ok || !payload.url) throw new Error(payload.message ?? "Checkout is not available yet.");
       window.location.assign(payload.url);
     } catch (cause) {
