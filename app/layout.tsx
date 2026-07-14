@@ -47,7 +47,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <head>
-        <script defer data-domain="homedesignai.co" src="http://43.163.88.44:8000/js/script.js" />
+        <script
+          defer
+          data-domain="homedesignai.co"
+          data-api="https://metrics.homedesignai.co/api/v"
+          src="https://metrics.homedesignai.co/js/m.js"
+        />
       </head>
       <body>
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`} strategy="afterInteractive" />
