@@ -11,12 +11,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { GeneratorWorkbench } from "@/components/generator-workbench";
 import { PricingSection } from "@/components/pricing-section";
-import { faqs, featureStats, homeHighlights, tools } from "@/lib/site";
+import { getAppUrl } from "@/lib/env";
+import { faqs, featureStats, homeDesignTools, homeHighlights, homepageTools, SITE_DESCRIPTION } from "@/lib/site";
+
+const homeUrl = `${getAppUrl()}/`;
 
 export const metadata: Metadata = {
-  title: "AI Floor Plans and Interior Design",
-  description: "Create floor plans, redesign rooms, stage property, and explore exterior ideas with private AI design tools.",
-  alternates: { canonical: "/" },
+  title: { absolute: "AI Home Design — Interior, Exterior & Room Design | Home Design AI" },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: homeUrl },
 };
 
 export default function HomePage() {
@@ -24,8 +27,17 @@ export default function HomePage() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: "Home Design AI",
+    url: homeUrl,
+    description: SITE_DESCRIPTION,
     applicationCategory: "DesignApplication",
     operatingSystem: "Web",
+    featureList: [
+      "AI interior design",
+      "AI virtual staging",
+      "AI home exterior design",
+      "AI garden design",
+      "AI floor plan tools",
+    ],
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
 
@@ -37,20 +49,20 @@ export default function HomePage() {
         <div className="site-shell relative grid min-h-[730px] items-stretch lg:grid-cols-[0.92fr_1.08fr]">
           <div className="flex flex-col justify-center py-20 pr-0 lg:py-24 lg:pr-14">
             <div className="reveal-up" style={{ "--i": 0 } as React.CSSProperties}>
-              <span className="eyebrow">Design the room before the room exists</span>
+              <span className="eyebrow">AI home design for real spaces</span>
             </div>
             <h1 className="display-title reveal-up mt-7" style={{ "--i": 1 } as React.CSSProperties}>
-              Space, made visible.
+              AI Home Design for Every Room
             </h1>
             <p className="lede reveal-up mt-8 max-w-[57ch]" style={{ "--i": 2 } as React.CSSProperties}>
-              Turn a brief, sketch, room photo, or floor plan into an idea you can see—and a conversation you can move forward.
+              Upload a room or home photo to explore AI interior design, virtual staging, exterior updates, and garden ideas before you renovate.
             </p>
             <div className="reveal-up mt-9 flex flex-col gap-3 sm:flex-row" style={{ "--i": 3 } as React.CSSProperties}>
               <Link className="button-primary" href="#create">
-                Start with 3 free credits <MoveRight size={17} />
+                Start your home design <MoveRight size={17} />
               </Link>
               <Link className="button-secondary" href="/interior-design-ai">
-                Explore interior design
+                Explore AI interior design
               </Link>
             </div>
             <div className="reveal-up mt-11 grid grid-cols-3 gap-px border-y border-[var(--line)] bg-[var(--line)]" style={{ "--i": 4 } as React.CSSProperties}>
@@ -89,12 +101,12 @@ export default function HomePage() {
       <section className="site-shell py-20 sm:py-28" id="create">
         <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-end">
           <div>
-            <span className="eyebrow">The design desk</span>
-            <h2 className="section-title mt-5">One workspace, three ways in.</h2>
+            <span className="eyebrow">AI home design studio</span>
+            <h2 className="section-title mt-5">Redesign interiors, stage rooms, or refresh your exterior.</h2>
           </div>
-          <p className="lede lg:justify-self-end">Start with words, an existing plan, or a room photo. Every result stays connected to its brief and settings.</p>
+          <p className="lede lg:justify-self-end">Upload the space you want to change, describe your direction, and create a visual concept you can refine before making real-world decisions.</p>
         </div>
-        <GeneratorWorkbench showTabs />
+        <GeneratorWorkbench defaultTool="interior-design-ai" showTabs />
       </section>
 
       <section className="content-auto border-y border-[var(--line)] bg-[var(--white)] py-20 sm:py-28">
@@ -102,16 +114,16 @@ export default function HomePage() {
           <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
             <div className="lg:sticky lg:top-32 lg:self-start">
               <span className="eyebrow">Tools for the whole home</span>
-              <h2 className="section-title mt-5">Choose the question you need answered.</h2>
-              <p className="lede mt-6">Each tool adds a different set of spatial or visual constraints before sending the job to the model.</p>
-              <Link className="button-secondary mt-8" href="/floor-plan-generator">Open the floor plan generator <MoveRight size={16} /></Link>
+              <h2 className="section-title mt-5">One home. More ways to see what comes next.</h2>
+              <p className="lede mt-6">Move from AI room design to exterior, garden, landscape, and floor plan concepts without leaving the same private workspace.</p>
+              <Link className="button-secondary mt-8" href="/interior-design-ai">Open AI interior design <MoveRight size={16} /></Link>
             </div>
             <div className="grid border-l border-t border-[var(--line)] sm:grid-cols-2">
-              {tools.map((tool, index) => {
+              {homepageTools.map((tool, index) => {
                 const Icon = tool.icon;
                 return (
                   <Link
-                    className={`group min-h-[230px] border-b border-r border-[var(--line)] p-6 transition-colors hover:bg-[var(--blue-pale)] ${index === 0 || index === 7 ? "sm:row-span-2 sm:min-h-[460px]" : ""}`}
+                    className={`group min-h-[230px] border-b border-r border-[var(--line)] p-6 transition-colors hover:bg-[var(--blue-pale)] ${index === 0 || index === homeDesignTools.length ? "sm:row-span-2 sm:min-h-[460px]" : ""}`}
                     href={tool.href}
                     key={tool.key}
                   >
@@ -133,12 +145,12 @@ export default function HomePage() {
       <section className="content-auto site-shell py-20 sm:py-28">
         <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div className="relative aspect-[4/3] overflow-hidden border border-[var(--line)] bg-[var(--white)]">
-            <Image alt="Original 2.5D furnished apartment floor plan" className="object-cover" fill sizes="(max-width: 1024px) 100vw, 50vw" src="/images/floor-plan-2-5d.webp" />
-            <div className="absolute left-0 top-0 bg-[var(--blue)] px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white">From layout to atmosphere</div>
+            <Image alt="AI home exterior design concept with warm natural materials and considered landscaping" className="object-cover" fill sizes="(max-width: 1024px) 100vw, 50vw" src="/images/exterior-concept.webp" />
+            <div className="absolute left-0 top-0 bg-[var(--blue)] px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-white">From interior to exterior</div>
           </div>
           <div>
-            <span className="eyebrow">A clearer early stage</span>
-            <h2 className="section-title mt-5">Useful decisions happen before the final render.</h2>
+            <span className="eyebrow">Whole-home design direction</span>
+            <h2 className="section-title mt-5">See a new direction before you renovate.</h2>
             <div className="mt-9 divide-y divide-[var(--line)] border-y border-[var(--line)]">
               {homeHighlights.map((item) => (
                 <div className="grid gap-4 py-6 sm:grid-cols-[48px_1fr]" key={item.number}>
@@ -158,9 +170,9 @@ export default function HomePage() {
             <h2 className="section-title">Bring the problem. Leave with a visual direction.</h2>
             <div className="grid gap-px border border-[var(--line-strong)] bg-[var(--line-strong)] sm:grid-cols-3">
               {[
-                { icon: UploadCloud, title: "Add context", text: "Upload a photo or plan when the geometry matters." },
-                { icon: MousePointer2, title: "Set the brief", text: "Choose the room, style, ratio, and a precise design request." },
-                { icon: Sparkles, title: "Create and refine", text: "Review the result in your private history and iterate." },
+                { icon: UploadCloud, title: "Upload your space", text: "Add a room, home exterior, garden, sketch, or floor plan when the existing context matters." },
+                { icon: MousePointer2, title: "Describe the change", text: "Choose the space, style, ratio, and the home design direction you want to explore." },
+                { icon: Sparkles, title: "Visualize and refine", text: "Create a private concept, review it in your history, and iterate before you renovate." },
               ].map((step, index) => {
                 const Icon = step.icon;
                 return <article className="min-h-[280px] bg-[var(--paper)] p-6" key={step.title}><div className="flex items-center justify-between"><Icon className="text-[var(--blue)]" size={23} /><span className="text-xs font-bold">0{index + 1}</span></div><h3 className="mt-16 text-xl font-semibold tracking-[-0.035em]">{step.title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{step.text}</p></article>;
@@ -190,8 +202,8 @@ export default function HomePage() {
 
       <section className="content-auto overflow-hidden border-t border-[var(--line)] bg-[var(--paper)] py-16 sm:py-20">
         <div className="site-shell grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div><span className="eyebrow">Ready when the idea is</span><h2 className="mt-4 max-w-[18ch] text-4xl font-semibold tracking-[-0.055em] sm:text-5xl">Start with a room, a plan, or a sentence.</h2></div>
-          <Link className="button-primary" href="/floor-plan-generator">Create your first design <MoveRight size={17} /></Link>
+          <div><span className="eyebrow">Ready to rethink your home?</span><h2 className="mt-4 max-w-[18ch] text-4xl font-semibold tracking-[-0.055em] sm:text-5xl">Create your next home design from a photo.</h2></div>
+          <Link className="button-primary" href="/interior-design-ai">Start with AI interior design <MoveRight size={17} /></Link>
         </div>
       </section>
     </main>

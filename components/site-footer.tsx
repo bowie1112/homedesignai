@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
-import { ideaPages, roomPages, tools } from "@/lib/site";
+import { floorPlanTools, homeDesignTools, ideaPages, roomPages } from "@/lib/site";
 
 const footerColumns = [
   {
-    title: "Floor plans",
-    links: tools.slice(0, 6).map((tool) => ({ label: tool.navLabel, href: tool.href })),
+    title: "Home design",
+    links: homeDesignTools.map((tool) => ({ label: tool.navLabel, href: tool.href })),
   },
   {
-    title: "Home design",
-    links: tools.slice(6).map((tool) => ({ label: tool.navLabel, href: tool.href })),
+    title: "Floor plans",
+    links: floorPlanTools.map((tool) => ({ label: tool.navLabel, href: tool.href })),
   },
   {
     title: "Explore",
@@ -40,7 +40,7 @@ export function SiteFooter() {
           <div>
             <BrandMark />
             <p className="mt-5 max-w-sm text-sm leading-6 text-[color:oklch(86%_0.02_84)]">
-              Early-stage design tools for clearer conversations about space, materials, and atmosphere.
+              AI home design tools for exploring interiors, staging, exteriors, gardens, landscapes, and floor plans before you renovate.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4">

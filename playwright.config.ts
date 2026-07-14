@@ -6,18 +6,18 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: "html",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://127.0.0.1:3107",
     trace: "on-first-retry",
-    channel: "chrome",
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
-    { name: "mobile", use: { ...devices["iPhone 13"], viewport: { width: 390, height: 844 } } },
+    { name: "desktop", use: { ...devices["Desktop Chrome"], channel: "chrome", viewport: { width: 1440, height: 900 } } },
+    { name: "mobile", use: { ...devices["Pixel 7"], channel: "chrome", viewport: { width: 390, height: 844 } } },
   ],
   webServer: {
-    command: "pnpm dev",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
+    command: "pnpm exec next dev --turbopack --hostname 127.0.0.1 --port 3107",
+    env: { NEXT_PUBLIC_APP_URL: "https://homedesignai.co" },
+    url: "http://127.0.0.1:3107",
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

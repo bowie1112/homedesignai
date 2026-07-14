@@ -1,21 +1,52 @@
 import { expect, test } from "@playwright/test";
 
-test("desktop navigation and generator tabs are usable", async ({ page }, testInfo) => {
+const homeDescription = "Upload a room or home photo to redesign interiors, virtually stage spaces, explore exterior and garden ideas, and visualize your home with AI.";
+
+test("desktop homepage presents AI Home Design as the primary intent", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Desktop-only navigation");
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Space, made visible." })).toBeVisible();
-  await page.getByRole("button", { name: "Home Design", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "AI Interior Design" })).toBeVisible();
-  await page.getByRole("button", { name: "Floor plans" }).click();
+  await expect(page).toHaveTitle("AI Home Design — Interior, Exterior & Room Design | Home Design AI");
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", homeDescription);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /^https:\/\/homedesignai\.co\/?$/);
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", /^https:\/\/homedesignai\.co\/?$/);
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", "AI Home Design — Interior, Exterior & Room Design");
+  await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute("content", "AI Home Design — Interior, Exterior & Room Design");
+
+  const structuredData = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? "{}");
+  expect(structuredData).toMatchObject({
+    "@type": "SoftwareApplication",
+    name: "Home Design AI",
+    url: "https://homedesignai.co/",
+    description: homeDescription,
+  });
+
+  await expect(page.getByRole("heading", { name: "AI Home Design for Every Room" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI Interior Design", exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("tab", { name: "AI Interior Design" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tab", { name: "AI Virtual Staging" })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Home Exterior Design" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Start with AI interior design/ })).toHaveAttribute("href", "/interior-design-ai");
+
+  const navigationButtons = page.getByRole("navigation", { name: "Main navigation" }).getByRole("button");
+  await expect(navigationButtons).toHaveText(["Home design", "Floor plans"]);
+  await page.getByRole("button", { name: "Floor plans", exact: true }).click();
   await expect(page.getByRole("link", { name: /Floor Plan Generator/ }).first()).toBeVisible();
 });
 
-test("mobile drawer exposes real tools", async ({ page }, testInfo) => {
+test("mobile drawer leads with home design and keeps floor plans reachable", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile", "Mobile-only interaction");
   await page.goto("/");
   await page.getByRole("button", { name: "Open navigation" }).click();
-  await expect(page.getByRole("link", { name: "Floor Plan Editor", exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Floor Plan Editor", exact: true }).click();
+  const mobileNavigation = page.getByLabel("Mobile navigation");
+  const homeDesignGroup = mobileNavigation.locator("details").filter({ hasText: "Home design" });
+  await expect(homeDesignGroup).toHaveAttribute("open", "");
+  await expect(homeDesignGroup.getByRole("link", { name: "AI Interior Design", exact: true })).toBeVisible();
+
+  const floorPlanGroup = mobileNavigation.locator("details").filter({ hasText: "Floor plans" });
+  await floorPlanGroup.locator("summary").click();
+  const floorPlanEditorLink = floorPlanGroup.getByRole("link", { name: "Floor Plan Editor", exact: true });
+  await expect(floorPlanEditorLink).toBeVisible();
+  await floorPlanEditorLink.click();
   await expect(page).toHaveURL(/floor-plan-editor/);
   await expect(page.getByRole("heading", { name: "AI Floor Plan Editor", exact: true }).first()).toBeVisible();
 });

@@ -80,7 +80,7 @@ export function SiteHeader() {
           </nav>
           <div className="hidden items-center gap-2 lg:flex">
             <Link className="button-ghost px-3 text-sm" href="/auth/sign-in">Sign in</Link>
-            <Link className="button-primary min-h-10 px-4 text-sm" href="/floor-plan-generator">Create a design</Link>
+            <Link className="button-primary min-h-10 px-4 text-sm" href="/interior-design-ai">Create a design</Link>
           </div>
           <button
             aria-expanded={mobileOpen}
@@ -103,7 +103,7 @@ export function SiteHeader() {
         className={`fixed bottom-0 right-0 top-[104px] z-[55] w-[min(88vw,360px)] overflow-y-auto border-l border-[var(--line)] bg-[var(--paper)] px-5 pb-[max(24px,env(safe-area-inset-bottom))] pt-4 shadow-[var(--shadow-lg)] transition-transform duration-300 lg:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         {navGroups.map((group) => (
-          <details className="border-b border-[var(--line)] py-2" key={group.label} open={group.label === "Floor plans"}>
+          <details className="border-b border-[var(--line)] py-2" key={group.label} open={group.label === "Home design"}>
             <summary className="flex min-h-12 list-none items-center justify-between text-sm font-bold">
               {group.label}<ChevronDown size={16} />
             </summary>
@@ -118,7 +118,7 @@ export function SiteHeader() {
         ))}
         <div className="grid gap-2 pt-5">
           <Link className="button-secondary" href="/pricing">View pricing</Link>
-          <Link className="button-primary" href="/floor-plan-generator">Create a design</Link>
+          <Link className="button-primary" href="/interior-design-ai">Create a design</Link>
           <Link className="button-ghost" href="/auth/sign-in">Sign in</Link>
         </div>
       </aside>

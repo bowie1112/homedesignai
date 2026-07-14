@@ -36,9 +36,9 @@ type GenerationResponse = {
 };
 
 const homeTabs: { label: string; mobileLabel: string; tool: ToolKey }[] = [
-  { label: "Floor Plan Generator", mobileLabel: "Generator", tool: "floor-plan-generator" },
-  { label: "Floor Plan Editor", mobileLabel: "Editor", tool: "floor-plan-editor" },
-  { label: "Home Design", mobileLabel: "Home Design", tool: "interior-design-ai" },
+  { label: "AI Interior Design", mobileLabel: "Interior", tool: "interior-design-ai" },
+  { label: "AI Virtual Staging", mobileLabel: "Staging", tool: "virtual-staging-ai" },
+  { label: "Home Exterior Design", mobileLabel: "Exterior", tool: "ai-home-exterior-design-free" },
 ];
 
 const statusCopy: Record<Exclude<JobStatus, "idle" | "success" | "failed" | "refunded">, string> = {

@@ -22,7 +22,7 @@ import {
 
 export const SITE_NAME = "Home Design AI";
 export const SITE_DESCRIPTION =
-  "Create thoughtful floor plans, room concepts, exterior ideas, and staged interiors with AI.";
+  "Upload a room or home photo to redesign interiors, virtually stage spaces, explore exterior and garden ideas, and visualize your home with AI.";
 
 export type ToolKey =
   | "floor-plan-generator"
@@ -147,7 +147,7 @@ export const tools: ToolDefinition[] = [
     key: "interior-design-ai",
     href: "/interior-design-ai",
     title: "AI Interior Design",
-    navLabel: "Interior Design",
+    navLabel: "AI Interior Design",
     eyebrow: "Redesign a room in context",
     description:
       "Upload a room and explore a new interior direction while keeping the architecture and camera angle intact.",
@@ -162,7 +162,7 @@ export const tools: ToolDefinition[] = [
     key: "virtual-staging-ai",
     href: "/virtual-staging-ai",
     title: "AI Virtual Staging",
-    navLabel: "Virtual Staging",
+    navLabel: "AI Virtual Staging",
     eyebrow: "Furnish an empty room",
     description:
       "Stage vacant property photography with coherent furniture, realistic scale, and believable lighting.",
@@ -177,7 +177,7 @@ export const tools: ToolDefinition[] = [
     key: "ai-home-exterior-design-free",
     href: "/ai-home-exterior-design-free",
     title: "AI Home Exterior Design",
-    navLabel: "Exterior Design",
+    navLabel: "AI Exterior Design",
     eyebrow: "Reimagine the street view",
     description:
       "Explore buildable facade, material, color, and planting ideas while retaining the shape of your home.",
@@ -192,7 +192,7 @@ export const tools: ToolDefinition[] = [
     key: "ai-garden-design-free",
     href: "/ai-garden-design-free",
     title: "AI Garden Design",
-    navLabel: "Garden Design",
+    navLabel: "AI Garden Design",
     eyebrow: "Design an outdoor room",
     description:
       "Generate garden concepts around your space, climate, desired maintenance level, and way of entertaining.",
@@ -207,7 +207,7 @@ export const tools: ToolDefinition[] = [
     key: "ai-landscape-design",
     href: "/ai-landscape-design",
     title: "AI Landscape Design",
-    navLabel: "Landscape Design",
+    navLabel: "AI Landscape Design",
     eyebrow: "Plan the larger landscape",
     description:
       "Visualize coherent paths, planting zones, outdoor uses, and material choices across a larger site.",
@@ -236,6 +236,9 @@ export const tools: ToolDefinition[] = [
 ];
 
 export const toolMap = new Map(tools.map((tool) => [tool.key, tool]));
+export const homeDesignTools = tools.filter((tool) => tool.resultKind !== "floor-plan");
+export const floorPlanTools = tools.filter((tool) => tool.resultKind === "floor-plan");
+export const homepageTools = [...homeDesignTools, ...floorPlanTools];
 
 export const roomPages = [
   { slug: "office-floor-plan", title: "Office Floor Plan Generator", room: "Office", icon: Building2 },
@@ -311,12 +314,12 @@ export const aspectRatios = [
 
 export const navGroups = [
   {
-    label: "Floor plans",
-    items: tools.slice(0, 6).map(({ navLabel, href, description }) => ({ label: navLabel, href, description })),
+    label: "Home design",
+    items: homeDesignTools.map(({ navLabel, href, description }) => ({ label: navLabel, href, description })),
   },
   {
-    label: "Home design",
-    items: tools.slice(6).map(({ navLabel, href, description }) => ({ label: navLabel, href, description })),
+    label: "Floor plans",
+    items: floorPlanTools.map(({ navLabel, href, description }) => ({ label: navLabel, href, description })),
   },
 ];
 
@@ -329,22 +332,27 @@ export const featureStats = [
 export const homeHighlights = [
   {
     number: "01",
-    title: "Plan before you render",
-    text: "Start with adjacencies, circulation, and constraints—not decoration. The result is a concept you can discuss with real clarity.",
+    title: "Start with the home you have",
+    text: "Upload a real room or exterior photo so each concept begins with the architecture, viewpoint, and details already in place.",
   },
   {
     number: "02",
-    title: "Keep structure in view",
-    text: "Editing tools prompt the model to preserve windows, walls, camera position, and room boundaries when those details matter.",
+    title: "Explore inside and out",
+    text: "Compare AI interior design, virtual staging, exterior updates, garden ideas, and landscape directions in one workspace.",
   },
   {
     number: "03",
-    title: "Move from plan to atmosphere",
-    text: "Use the same workspace for floor-plan concepts, furnished visualizations, interior directions, and exterior studies.",
+    title: "Use plans when layout matters",
+    text: "Floor plan tools remain available for early layout studies, while home design tools help you see materials, furniture, and atmosphere.",
   },
 ];
 
 export const faqs = [
+  {
+    question: "What can I design with Home Design AI?",
+    answer:
+      "Use AI home design tools to redesign rooms, stage empty interiors, explore home exterior updates, plan garden and landscape directions, or turn an early sketch into a realistic concept image.",
+  },
   {
     question: "Is Home Design AI a replacement for an architect?",
     answer:
