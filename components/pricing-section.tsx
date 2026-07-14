@@ -1,27 +1,9 @@
 import { Check, MoveRight } from "lucide-react";
 import Link from "next/link";
 import { BillingButton } from "@/components/billing-button";
+import { formatUsd, paymentPlans } from "@/lib/payments/plans";
 
-const plans = [
-  {
-    key: "starter",
-    name: "Starter",
-    price: "$9",
-    credits: "80 credits each month",
-    description: "For exploring layouts and a handful of room directions.",
-    features: ["Basic and Pro models", "Private design history", "Credits never expire"],
-    featured: false,
-  },
-  {
-    key: "pro",
-    name: "Pro",
-    price: "$19",
-    credits: "220 credits each month",
-    description: "For active renovators, property teams, and design studios.",
-    features: ["Basic and Pro models", "2K Pro output", "Private design history", "Credits never expire"],
-    featured: true,
-  },
-];
+const plans = [paymentPlans.starter, paymentPlans.pro];
 
 export function PricingSection({ compact = false }: { compact?: boolean }) {
   return (
@@ -37,14 +19,14 @@ export function PricingSection({ compact = false }: { compact?: boolean }) {
           </div>
           <div className="grid gap-px bg-[color:oklch(74%_0.02_257/0.35)] sm:grid-cols-2">
             {plans.map((plan) => (
-              <article className={`relative p-6 sm:p-8 ${plan.featured ? "bg-[var(--blue)] text-white" : compact ? "bg-[var(--white)]" : "bg-[color:oklch(26%_0.035_257)]"}`} key={plan.name}>
+              <article className={`relative p-6 sm:p-8 ${plan.featured ? "bg-[var(--blue)] text-white" : compact ? "bg-[var(--white)]" : "bg-[color:oklch(26%_0.035_257)]"}`} key={plan.id}>
                 {plan.featured ? <span className="absolute right-4 top-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[color:oklch(88%_0.04_258)]">Best value</span> : null}
-                <h3 className="text-sm font-bold uppercase tracking-[0.1em]">{plan.name}</h3>
+                <h3 className="text-sm font-bold uppercase tracking-[0.1em]">{plan.id === "starter" ? "Starter" : "Pro"}</h3>
                 <div className="mt-7 flex items-end gap-2">
-                  <span className="text-5xl font-semibold tracking-[-0.06em]">{plan.price}</span>
+                  <span className="text-5xl font-semibold tracking-[-0.06em]">{formatUsd(plan.amount)}</span>
                   <span className={`pb-1 text-sm ${plan.featured ? "text-[color:oklch(90%_0.03_258)]" : compact ? "text-[var(--ink-soft)]" : "text-[color:oklch(78%_0.02_84)]"}`}>/ month</span>
                 </div>
-                <p className="mt-2 text-sm font-bold">{plan.credits}</p>
+                <p className="mt-2 text-sm font-bold">{plan.creditsPerInvoice} credits each month</p>
                 <p className={`mt-5 min-h-12 text-sm leading-6 ${plan.featured ? "text-[color:oklch(93%_0.02_258)]" : compact ? "text-[var(--ink-soft)]" : "text-[color:oklch(78%_0.02_84)]"}`}>{plan.description}</p>
                 <ul className="mt-6 space-y-2.5">
                   {plan.features.map((feature) => (
@@ -53,10 +35,10 @@ export function PricingSection({ compact = false }: { compact?: boolean }) {
                 </ul>
                 <div className="mt-8">
                   {compact ? (
-                    <BillingButton product={plan.key} variant={plan.featured ? "primary" : "secondary"}>Choose {plan.name}</BillingButton>
+                    <BillingButton planId={plan.id} variant={plan.featured ? "primary" : "secondary"}>Choose {plan.id === "starter" ? "Starter" : "Pro"}</BillingButton>
                   ) : (
-                    <Link className={`w-full ${plan.featured ? "button-secondary border-white bg-white text-[var(--blue-deep)]" : "button-primary"}`} href={`/pricing?plan=${plan.key}`}>
-                      Choose {plan.name} <MoveRight size={16} />
+                    <Link className={`w-full ${plan.featured ? "button-secondary border-white bg-white text-[var(--blue-deep)]" : "button-primary"}`} href={`/pricing?plan=${plan.id}`}>
+                      Choose {plan.id === "starter" ? "Starter" : "Pro"} <MoveRight size={16} />
                     </Link>
                   )}
                 </div>

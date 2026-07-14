@@ -77,7 +77,7 @@ create table public.subscriptions (
   user_id uuid not null references public.profiles(id) on delete cascade,
   stripe_subscription_id text not null unique,
   stripe_customer_id text not null,
-  stripe_price_id text,
+  product_key text,
   status text not null,
   cancel_at_period_end boolean not null default false,
   current_period_end timestamptz,

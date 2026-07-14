@@ -2,8 +2,9 @@
 
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
+import type { PaymentPlanId } from "@/lib/payments/plans";
 
-export function BillingButton({ product, children, variant = "primary" }: { product: string; children: React.ReactNode; variant?: "primary" | "secondary" }) {
+export function BillingButton({ planId, children, variant = "primary" }: { planId: PaymentPlanId; children: React.ReactNode; variant?: "primary" | "secondary" }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,10 +12,10 @@ export function BillingButton({ product, children, variant = "primary" }: { prod
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/billing/checkout", {
+      const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ product }),
+        body: JSON.stringify({ planId }),
       });
       const payload = (await response.json()) as { url?: string; message?: string };
       if (!response.ok || !payload.url) throw new Error(payload.message ?? "Checkout is not available yet.");

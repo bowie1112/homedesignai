@@ -8,7 +8,7 @@ Production-oriented MVP for AI floor plans and home-design concept images. Built
 2. Copy `.env.example` to `.env.local` and fill in the provider credentials.
 3. Create a Supabase project and apply `supabase/migrations/202607100001_initial.sql`.
 4. In Supabase Auth, enable Google OAuth and add `http://localhost:3000/auth/callback` plus the production callback URL.
-5. Create the Stripe prices named in `.env.example`, then point a Stripe webhook at `/api/webhooks/stripe` for:
+5. Configure the Stripe secret and webhook keys from `.env.example`. Checkout prices are defined in `lib/payments/plans.ts`; no Dashboard Product or Price setup is required. Point a Stripe webhook at `/api/webhooks/stripe` for:
    - `checkout.session.completed`
    - `invoice.paid`
    - `customer.subscription.created`

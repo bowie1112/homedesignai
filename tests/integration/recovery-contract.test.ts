@@ -7,6 +7,8 @@ const generationService = read("lib/generation/service.ts");
 const kieWebhook = read("app/api/webhooks/kie/route.ts");
 const reconciliation = read("app/api/cron/reconcile-kie/route.ts");
 const stripeWebhook = read("app/api/webhooks/stripe/route.ts");
+const checkout = read("app/api/checkout/route.ts");
+const plans = read("lib/payments/plans.ts");
 const sitemap = read("app/sitemap.ts");
 
 describe("durable recovery integration contracts", () => {
@@ -34,8 +36,21 @@ describe("durable recovery integration contracts", () => {
   it("grants pack and subscription credits from separate Stripe signals", () => {
     expect(stripeWebhook).toMatch(/checkout\.session\.completed[\s\S]+handleCheckoutCompleted/);
     expect(stripeWebhook).toMatch(/invoice\.paid[\s\S]+handleInvoicePaid/);
-    expect(stripeWebhook).toContain('product.kind === "credit_pack"');
+    expect(stripeWebhook).toContain('plan.kind === "one_time"');
+    expect(stripeWebhook).toContain('session.payment_status === "paid"');
     expect(stripeWebhook).toContain('"subscription"');
+    expect(stripeWebhook).toContain("subscription.metadata.planId");
+    expect(stripeWebhook).not.toContain("findSubscriptionProductByPrice");
+  });
+
+  it("creates code-priced Checkout sessions from a server-owned plan", () => {
+    expect(checkout).toContain("price_data");
+    expect(checkout).toContain("unit_amount: plan.amount");
+    expect(checkout).toContain("recurring: { interval: plan.interval }");
+    expect(checkout).toContain("allow_promotion_codes: true");
+    expect(checkout).toContain("z.object({ planId:");
+    expect(checkout).not.toContain("priceEnv");
+    expect(plans).toContain("creditsPerInvoice");
   });
 
   it("keeps deferred native editing and DXF routes out of the public sitemap", () => {
