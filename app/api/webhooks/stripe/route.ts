@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { requireEnv } from "@/lib/env";
 import { creditsGrantedForPaidInvoice, getPaymentPlan, type PaymentPlanId } from "@/lib/payments/plans";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, getStripeWebhookSecret } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -119,7 +118,7 @@ export async function POST(request: NextRequest) {
   if (!signature) return NextResponse.json({ message: "Missing Stripe signature." }, { status: 400 });
   let event: Stripe.Event;
   try {
-    event = getStripe().webhooks.constructEvent(await request.text(), signature, requireEnv("STRIPE_WEBHOOK_SECRET"));
+    event = getStripe().webhooks.constructEvent(await request.text(), signature, getStripeWebhookSecret());
   } catch (cause) {
     return NextResponse.json({ message: cause instanceof Error ? cause.message : "Invalid Stripe signature." }, { status: 400 });
   }
