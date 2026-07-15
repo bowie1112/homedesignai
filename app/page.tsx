@@ -206,6 +206,26 @@ export default function HomePage() {
           <Link className="button-primary" href="/interior-design-ai">Start with AI interior design <MoveRight size={17} /></Link>
         </div>
       </section>
+
+      <section aria-label="Featured on There's An AI For That" className="border-t border-[var(--line)] bg-[var(--white)] py-8">
+        <div className="site-shell flex justify-center sm:justify-start">
+          <a
+            href="https://theresanaiforthat.com/ai/home-design-ai-1784108411/?ref=featured&v=9177459"
+            rel="nofollow noopener noreferrer"
+            target="_blank"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt="Featured on There's An AI For That"
+              className="h-auto max-w-full"
+              decoding="async"
+              loading="lazy"
+              src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600"
+              width="300"
+            />
+          </a>
+        </div>
+      </section>
     </main>
   );
 }
