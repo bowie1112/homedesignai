@@ -16,29 +16,6 @@ import { faqs, featureStats, homeDesignTools, homeHighlights, homepageTools, SIT
 
 const homeUrl = `${getAppUrl()}/`;
 
-const homeDesignPathways = [
-  {
-    href: "/interior-design-ai",
-    title: "AI room and interior design",
-    text: "Upload a real room photo to compare furniture, materials, color, and lighting while asking the model to preserve the existing architecture.",
-  },
-  {
-    href: "/floor-plan-generator",
-    title: "AI floor plan generator",
-    text: "Turn a written room program into a furnished floor plan concept for discussing circulation, adjacency, storage, and broad layout options.",
-  },
-  {
-    href: "/floor-plan-to-3d",
-    title: "Floor plan to 3D rendering",
-    text: "Convert a clear 2D plan into a furnished 3D-style presentation image without presenting the result as an editable model or technical drawing.",
-  },
-  {
-    href: "/ai-home-exterior-design-free",
-    title: "AI home exterior design",
-    text: "Explore facade colors, materials, entries, windows, lighting, and planting around a photo of the house before planning a renovation.",
-  },
-] as const;
-
 export const metadata: Metadata = {
   title: { absolute: "AI Home Design — Interior, Exterior & Room Design | Home Design AI" },
   description: SITE_DESCRIPTION,
@@ -160,39 +137,6 @@ export default function HomePage() {
                   </Link>
                 );
               })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="content-auto border-b border-[var(--line)] bg-[var(--paper)] py-20 sm:py-28">
-        <div className="site-shell grid gap-12 lg:grid-cols-[0.78fr_1.22fr]">
-          <div>
-            <span className="eyebrow">What is AI home design?</span>
-            <h2 className="section-title mt-5">Connect the room photo, the floor plan, and the decision.</h2>
-          </div>
-          <div>
-            <div className="max-w-3xl space-y-5 text-base leading-7 text-[var(--ink-soft)]">
-              <p>
-                AI home design is a visual workflow for exploring changes before you buy materials, move furniture, or begin a renovation. Instead of working from a generic template, Home Design AI lets you start with the evidence you already have: a room photo, an exterior photo, a floor plan, or a written description of the spaces you need.
-              </p>
-              <p>
-                Choose the tool that matches the decision. Use AI room design when finishes, furniture, and atmosphere matter; use the AI floor plan generator when relationships between rooms are still open; convert a selected floor plan to a 3D rendering when the drawing needs to be easier to understand; or preview an exterior remodel around the recognizable shape of your house.
-              </p>
-              <p>
-                Generated results are concept images for comparison and communication, not measured construction documents. New accounts receive 3 signup credits: Basic generations cost 1 credit, while Pro creates a fixed 2K image for 3 credits. Continue only with the directions worth verifying through real samples, measurements, professional drawings, and local code review.
-              </p>
-            </div>
-            <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] sm:grid-cols-2">
-              {homeDesignPathways.map((pathway) => (
-                <Link className="group bg-[var(--white)] p-6 transition-colors hover:bg-[var(--blue-pale)]" href={pathway.href} key={pathway.href}>
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="text-xl font-semibold tracking-[-0.035em]">{pathway.title}</h3>
-                    <MoveRight className="shrink-0 text-[var(--blue)] transition-transform group-hover:translate-x-1" size={17} />
-                  </div>
-                  <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{pathway.text}</p>
-                </Link>
-              ))}
             </div>
           </div>
         </div>
