@@ -263,12 +263,12 @@ export async function getJobWithSignedResult(jobId: string, userId: string) {
       resultUrl = signed?.signedUrl ?? null;
     }
   }
-  return { id: job.id, status: job.status, resultUrl, error: job.error_message };
+  return { id: job.id, status: job.status, resultUrl, error: job.error_message, tool: job.tool, tier: job.tier };
 }
 
 export async function listJobs(userId: string, cursor?: string | null) {
   const admin = createAdminClient();
-  let query = admin.from("generation_jobs").select("id, tool, prompt, status, result_asset_id, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(24);
+  let query = admin.from("generation_jobs").select("id, tool, tier, prompt, status, result_asset_id, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(24);
   if (cursor) query = query.lt("created_at", cursor);
   const { data, error } = await query;
   if (error) throw new Error(`Design history could not be loaded: ${error.message}`);
@@ -278,7 +278,68 @@ export async function listJobs(userId: string, cursor?: string | null) {
   const jobs = await Promise.all(data.map(async (job) => {
     const path = job.result_asset_id ? paths.get(job.result_asset_id) : null;
     const signed = path ? await admin.storage.from(STORAGE_BUCKET).createSignedUrl(path, 60 * 60) : null;
-    return { id: job.id, tool: job.tool, prompt: job.prompt, status: job.status, resultUrl: signed?.data?.signedUrl ?? null, createdAt: job.created_at };
+    return { id: job.id, tool: job.tool, tier: job.tier, prompt: job.prompt, status: job.status, resultUrl: signed?.data?.signedUrl ?? null, createdAt: job.created_at };
   }));
   return { jobs, nextCursor: data.length === 24 ? data.at(-1)?.created_at ?? null : null };
+}
+
+export async function deleteGenerationJob({
+  userId,
+  jobId,
+  eventId,
+  occurredAt,
+  surface,
+}: {
+  userId: string;
+  jobId: string;
+  eventId: string;
+  occurredAt: string;
+  surface: "generator" | "history";
+}) {
+  const admin = createAdminClient();
+  const { data: recorded } = await admin
+    .from("product_events")
+    .select("id")
+    .eq("id", eventId)
+    .eq("user_id", userId)
+    .eq("generation_job_id", jobId)
+    .eq("event_name", "result_deleted")
+    .maybeSingle();
+  if (recorded) return true;
+
+  const { data: job, error: jobError } = await admin
+    .from("generation_jobs")
+    .select("id, status, input_asset_ids, result_asset_id")
+    .eq("id", jobId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (jobError) throw new Error(`The design could not be checked: ${jobError.message}`);
+  if (!job) throw new Error("Design not found.");
+  if (!["success", "failed", "refunded"].includes(job.status)) throw new Error("Wait for this design to finish before deleting it.");
+
+  const assetIds = [...job.input_asset_ids, job.result_asset_id].filter(Boolean) as string[];
+  if (assetIds.length) {
+    const { data: assets, error: assetError } = await admin
+      .from("assets")
+      .select("storage_path")
+      .eq("user_id", userId)
+      .in("id", assetIds);
+    if (assetError) throw new Error(`The design files could not be checked: ${assetError.message}`);
+    const paths = assets.map((asset) => asset.storage_path);
+    if (paths.length) {
+      const { error: storageError } = await admin.storage.from(STORAGE_BUCKET).remove(paths);
+      if (storageError) throw new Error(`The design files could not be deleted: ${storageError.message}`);
+    }
+  }
+
+  const { data, error } = await admin.rpc("delete_generation_job", {
+    p_user_id: userId,
+    p_job_id: jobId,
+    p_event_id: eventId,
+    p_occurred_at: occurredAt,
+    p_surface: surface,
+  });
+  if (error) throw new Error(`The design record could not be deleted: ${error.message}`);
+  if (!data) throw new Error("Design not found.");
+  return true;
 }

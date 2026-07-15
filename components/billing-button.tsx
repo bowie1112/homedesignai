@@ -2,6 +2,7 @@
 
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
+import { trackGaEvent, trackProductEvent } from "@/lib/analytics";
 import type { PaymentPlanId } from "@/lib/payments/plans";
 
 export function BillingButton({ authenticated, planId, children, variant = "primary" }: { authenticated: boolean; planId: PaymentPlanId; children: React.ReactNode; variant?: "primary" | "secondary" }) {
@@ -12,10 +13,12 @@ export function BillingButton({ authenticated, planId, children, variant = "prim
     const returnPath = `/pricing?plan=${encodeURIComponent(planId)}`;
     const signInPath = `/auth/sign-in?next=${encodeURIComponent(returnPath)}`;
     if (!authenticated) {
+      trackGaEvent("checkout_started", { plan_id: planId, surface: "pricing" });
       window.location.assign(signInPath);
       return;
     }
 
+    void trackProductEvent({ eventName: "checkout_started", surface: "pricing", properties: { plan_id: planId } });
     setLoading(true);
     setError(null);
     try {
@@ -30,9 +33,11 @@ export function BillingButton({ authenticated, planId, children, variant = "prim
         return;
       }
       if (!response.ok || !payload.url) throw new Error(payload.message ?? "Checkout is not available yet.");
+      await trackProductEvent({ eventName: "checkout_redirected", surface: "pricing", properties: { plan_id: planId } });
       window.location.assign(payload.url);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Checkout is not available yet.");
+      void trackProductEvent({ eventName: "checkout_failed", surface: "pricing", properties: { plan_id: planId } });
       setLoading(false);
     }
   };

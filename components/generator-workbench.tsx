@@ -4,7 +4,6 @@ import {
   Check,
   ChevronDown,
   Clock3,
-  Download,
   ImageIcon,
   LoaderCircle,
   LockKeyhole,
@@ -18,6 +17,8 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ResultActions } from "@/components/result-actions";
+import { trackProductEvent } from "@/lib/analytics";
 import {
   aspectRatios,
   designStyles,
@@ -33,7 +34,11 @@ type GenerationResponse = {
   status: Exclude<JobStatus, "idle" | "uploading">;
   resultUrl?: string | null;
   error?: string | null;
+  tool?: string;
+  tier?: "basic" | "pro";
 };
+
+class ProviderGenerationError extends Error {}
 
 const homeTabs: { label: string; mobileLabel: string; tool: ToolKey }[] = [
   { label: "AI Interior Design", mobileLabel: "Interior", tool: "interior-design-ai" },
@@ -122,7 +127,7 @@ export function GeneratorWorkbench({
       setResult(job);
       setStatus(job.status);
       if (job.status === "success") return;
-      if (job.status === "failed") throw new Error(job.error ?? "The model could not complete this design. Your credits were returned.");
+      if (job.status === "failed") throw new ProviderGenerationError(job.error ?? "The model could not complete this design. Your credits were returned.");
       if (job.status === "refunded") {
         setError("This design exceeded the 60-minute window, so its credits were returned. Late results will still be recovered to your history.");
         return;
@@ -135,6 +140,8 @@ export function GeneratorWorkbench({
     if (!canGenerate) return;
     setError(null);
     setResult(null);
+    let failureStage = files.length ? "upload" : "start";
+    let startedJobId: string | undefined;
     try {
       setStatus(files.length ? "uploading" : "queued");
       const inputAssetIds: string[] = [];
@@ -165,14 +172,22 @@ export function GeneratorWorkbench({
         throw new Error("Sign in with Google to save private uploads and use your credits.");
       }
       if (!response.ok) {
+        if (response.status === 402) {
+          void trackProductEvent({ eventName: "insufficient_credits_seen", surface: "generator", properties: { tool: activeTool, tier } });
+        }
         throw new Error(payload.message ?? payload.error ?? "We could not start this design. No credits were used.");
       }
+      startedJobId = payload.id;
       setResult(payload);
       setStatus(payload.status);
+      failureStage = "poll";
       await pollJob(payload.id);
     } catch (cause) {
       setStatus("failed");
       setError(cause instanceof Error ? cause.message : "We could not start this design. No credits were used.");
+      if (!(cause instanceof ProviderGenerationError)) {
+        void trackProductEvent({ eventName: "generation_client_failed", surface: "generator", generationJobId: startedJobId, properties: { tool: activeTool, tier, failure_stage: failureStage } });
+      }
     }
   };
 
@@ -400,11 +415,7 @@ export function GeneratorWorkbench({
                   {status === "success" ? <Check className="text-[var(--green)]" size={15} /> : <ImageIcon size={15} />}
                   {status === "success" ? "Saved to your history" : "Your final result appears here"}
                 </div>
-                {result?.resultUrl ? (
-                  <a className="button-ghost min-h-9 px-2 text-xs" download href={result.resultUrl}>
-                    <Download size={14} /> Download
-                  </a>
-                ) : null}
+                {result ? <ResultActions jobId={result.id} onDeleted={reset} resultUrl={result.resultUrl ?? null} status={result.status} surface="generator" tier={result.tier ?? tier} tool={result.tool ?? activeTool} /> : null}
               </div>
             </div>
           </div>

@@ -4,10 +4,13 @@ import { Clock3, ImageIcon, LoaderCircle, MoveRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ResultActions } from "@/components/result-actions";
+import { trackProductEvent } from "@/lib/analytics";
 
 type HistoryJob = {
   id: string;
   tool: string;
+  tier: "basic" | "pro";
   prompt: string;
   status: string;
   resultUrl: string | null;
@@ -25,7 +28,10 @@ export function HistoryGallery() {
       .then(async (response) => {
         const payload = (await response.json()) as { jobs?: HistoryJob[]; message?: string };
         if (!response.ok) throw new Error(payload.message ?? "Your history could not be loaded.");
-        if (!cancelled) setJobs(payload.jobs ?? []);
+        if (!cancelled) {
+          setJobs(payload.jobs ?? []);
+          void trackProductEvent({ eventName: "history_opened", surface: "history" });
+        }
       })
       .catch((cause) => {
         if (!cancelled) setMessage(cause instanceof Error ? cause.message : "Your history could not be loaded.");
@@ -47,7 +53,13 @@ export function HistoryGallery() {
           <div className="relative aspect-[4/3] bg-[var(--paper-deep)]">
             {job.resultUrl ? <Image alt="Generated design" className="object-cover" fill sizes="(max-width: 768px) 100vw, 33vw" src={job.resultUrl} /> : <div className="grid h-full place-items-center"><LoaderCircle className="animate-spin text-[var(--blue)]" /></div>}
           </div>
-          <div className="p-4"><div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--ink-soft)]"><span>{job.tool.replaceAll("-", " ")}</span><span>{job.status}</span></div><p className="mt-3 line-clamp-2 text-sm leading-5">{job.prompt}</p></div>
+          <div className="p-4">
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--ink-soft)]"><span>{job.tool.replaceAll("-", " ")}</span><span>{job.status}</span></div>
+            <p className="mt-3 line-clamp-2 text-sm leading-5">{job.prompt}</p>
+            <div className="mt-4 border-t border-[var(--line)] pt-3">
+              <ResultActions jobId={job.id} onDeleted={() => setJobs((current) => current.filter((item) => item.id !== job.id))} resultUrl={job.resultUrl} status={job.status} surface="history" tier={job.tier} tool={job.tool} />
+            </div>
+          </div>
         </article>
       ))}
     </div>
