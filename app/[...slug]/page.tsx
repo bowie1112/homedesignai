@@ -38,7 +38,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const converter = slug[0] === "tools" ? converterPages.find((page) => page.slug === slug[1]) : undefined;
   if (converter) return { title: `${converter.title} Converter`, description: `Convert ${converter.from} to ${converter.to} instantly.`, alternates: { canonical: `/tools/${converter.slug}` } };
   const titles: Record<string, string> = { privacy: "Privacy Policy", terms: "Terms of Service", affiliate: "Affiliate Program" };
-  return { title: titles[path] ?? "Page" };
+  if (titles[path]) return { title: titles[path], alternates: { canonical: `/${path}` } };
+  return { title: "Page" };
 }
 
 export default async function CatchAllPage({ params }: PageProps) {

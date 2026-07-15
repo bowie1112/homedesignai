@@ -31,3 +31,24 @@ test("commercial copy keeps free-credit and 3D output claims accurate", async ({
   await expect(page.getByText("Downloaded results are images intended for visualization and communication.", { exact: false })).toBeVisible();
   await expect(page.getByText(/New accounts receive 3 signup credits/).first()).toBeVisible();
 });
+
+test("public legal and affiliate pages expose self-referencing canonicals", async ({ page }) => {
+  for (const path of ["/affiliate", "/privacy", "/terms"]) {
+    await page.goto(path);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://homedesignai.co${path}`);
+  }
+});
+
+test("the sitemap lists only the 34 intended public URLs without synthetic lastmod values", async ({ request }) => {
+  const response = await request.get("/sitemap.xml");
+  expect(response.ok()).toBe(true);
+
+  const xml = await response.text();
+  const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
+
+  expect(urls).toHaveLength(34);
+  expect(new Set(urls).size).toBe(34);
+  expect(urls.every((url) => url.startsWith("https://homedesignai.co"))).toBe(true);
+  expect(xml).not.toContain("<lastmod>");
+  expect(urls.some((url) => /\/(?:account|history|auth|api)(?:\/|$)/.test(new URL(url).pathname))).toBe(false);
+});
