@@ -24,7 +24,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const path = slug.join("/");
   const tool = toolMap.get(path as Parameters<typeof toolMap.get>[0]);
-  if (tool) return { title: tool.title, description: tool.description, alternates: { canonical: tool.href } };
+  if (tool) {
+    return {
+      title: tool.metaTitle ? { absolute: tool.metaTitle } : tool.title,
+      description: tool.metaDescription ?? tool.description,
+      alternates: { canonical: tool.href },
+    };
+  }
   const room = roomPages.find((page) => page.slug === path);
   if (room) return { title: room.title, description: `Create a thoughtful ${room.room.toLowerCase()} layout with an AI floor plan generator.`, alternates: { canonical: `/${room.slug}` } };
   const idea = slug[0] === "ideas" ? ideaPages.find((page) => page.slug === slug[1]) : undefined;

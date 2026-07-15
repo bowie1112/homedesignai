@@ -57,6 +57,8 @@ export function ToolLandingPage({ tool }: { tool: ToolDefinition }) {
         <GeneratorWorkbench defaultTool={tool.key} />
       </section>
 
+      <ToolIntentContent tool={tool} />
+
       <section className="content-auto border-y border-[var(--line)] bg-[var(--white)] py-20 sm:py-28">
         <div className="site-shell grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
@@ -104,5 +106,103 @@ export function ToolLandingPage({ tool }: { tool: ToolDefinition }) {
         </div>
       </section>
     </main>
+  );
+}
+
+function ToolIntentContent({ tool }: { tool: ToolDefinition }) {
+  if (!tool.intentSections?.length) return null;
+
+  return (
+    <>
+      {tool.intentSections.map((section, sectionIndex) => (
+        <section
+          className={`content-auto border-t border-[var(--line)] py-20 sm:py-28 ${sectionIndex % 2 === 0 ? "bg-[var(--blue-pale)]" : "bg-[var(--paper)]"}`}
+          key={section.title}
+        >
+          <div className="site-shell grid gap-12 lg:grid-cols-[0.82fr_1.18fr]">
+            <div>
+              <span className="eyebrow">{section.eyebrow}</span>
+              <h2 className="section-title mt-5">{section.title}</h2>
+              <div className="mt-7 space-y-5 text-base leading-7 text-[var(--ink-soft)]">
+                {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              </div>
+            </div>
+            <div className="grid gap-px border border-[var(--line-strong)] bg-[var(--line-strong)] sm:grid-cols-3">
+              {section.items.map((item, index) => (
+                <article className="min-h-[260px] bg-[var(--white)] p-6" key={item.title}>
+                  <span className="text-xs font-bold text-[var(--blue)]">0{index + 1}</span>
+                  <h3 className="mt-14 text-xl font-semibold tracking-[-0.035em]">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {tool.commercialQuestions?.length ? (
+        <section className="content-auto border-y border-[var(--line)] bg-[var(--white)] py-20 sm:py-24">
+          <div className="site-shell">
+            <div className="grid gap-7 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div>
+                <span className="eyebrow">Before you choose</span>
+                <h2 className="section-title mt-5">Understand the output, credits, and next step.</h2>
+              </div>
+              <Link className="button-secondary" href="/pricing">Compare credit pricing <MoveRight size={16} /></Link>
+            </div>
+            <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] lg:grid-cols-3">
+              {tool.commercialQuestions.map((item) => (
+                <article className="bg-[var(--paper)] p-6 sm:p-8" key={item.question}>
+                  <h3 className="text-xl font-semibold tracking-[-0.035em]">{item.question}</h3>
+                  <p className="mt-4 text-sm leading-6 text-[var(--ink-soft)]">{item.answer}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {tool.faqs?.length ? (
+        <section className="content-auto site-shell py-20 sm:py-28">
+          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <span className="eyebrow">Common questions</span>
+              <h2 className="section-title mt-5">What to know before creating.</h2>
+            </div>
+            <div className="border-t border-[var(--line)]">
+              {tool.faqs.map((faq, index) => (
+                <details className="group border-b border-[var(--line)]" key={faq.question} open={index === 0}>
+                  <summary className="flex min-h-20 cursor-pointer list-none items-center justify-between gap-5 text-base font-semibold tracking-[-0.02em]">
+                    {faq.question}
+                    <span className="grid size-8 shrink-0 place-items-center border border-[var(--line)] text-[var(--blue)] transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <p className="max-w-2xl pb-7 text-sm leading-6 text-[var(--ink-soft)]">{faq.answer}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {tool.relatedLinks?.length ? (
+        <section className="content-auto border-t border-[var(--line)] bg-[var(--paper-deep)] py-16 sm:py-20">
+          <div className="site-shell">
+            <span className="eyebrow">Continue your project</span>
+            <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] sm:text-4xl">Related home design tools</h2>
+            <div className="mt-8 grid gap-px border border-[var(--line)] bg-[var(--line)] lg:grid-cols-3">
+              {tool.relatedLinks.map((item) => (
+                <Link className="group bg-[var(--white)] p-6 transition-colors hover:bg-[var(--blue-pale)]" href={item.href} key={item.href}>
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="text-lg font-semibold tracking-[-0.025em]">{item.label}</h3>
+                    <MoveRight className="shrink-0 text-[var(--blue)] transition-transform group-hover:translate-x-1" size={17} />
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{item.description}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+    </>
   );
 }
