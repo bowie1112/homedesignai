@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "@fontsource-variable/instrument-sans";
 import "./globals.css";
+import { GoogleOneTap } from "@/components/google-one-tap";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
@@ -64,6 +65,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             gtag('config', '${googleTagId}');
           `}
         </Script>
+        <GoogleOneTap />
         <a className="skip-link" href="#main-content">
           Skip to main content
         </a>

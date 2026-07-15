@@ -2,6 +2,22 @@ import { expect, test } from "@playwright/test";
 
 const homeDescription = "Upload a room or home photo to redesign interiors, virtually stage spaces, explore exterior and garden ideas, and visualize your home with AI.";
 
+test.beforeEach(async ({ page }) => {
+  await page.route("https://accounts.google.com/gsi/client", async (route) => {
+    await route.fulfill({
+      contentType: "application/javascript",
+      body: `
+        window.__googleOneTapCalls = [];
+        window.google = { accounts: { id: {
+          initialize(config) { window.__googleOneTapCalls.push({ type: "initialize", config }); },
+          prompt() { window.__googleOneTapCalls.push({ type: "prompt" }); },
+          cancel() { window.__googleOneTapCalls.push({ type: "cancel" }); }
+        } } };
+      `,
+    });
+  });
+});
+
 test("desktop homepage presents AI Home Design as the primary intent", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Desktop-only navigation");
   await page.goto("/");
@@ -66,6 +82,23 @@ test("sign-in page and OAuth failure recovery remain reachable", async ({ page }
   await page.goto("/auth/callback");
   await expect(page).toHaveURL(/\/auth\/sign-in\?error=oauth/);
   await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
+});
+
+test("Google One Tap initializes on acquisition pages and stays off account pages", async ({ browser, page }) => {
+  const accountPage = await browser.newPage();
+  await accountPage.goto("/account");
+  await expect(accountPage.locator('script[src="https://accounts.google.com/gsi/client"]')).toHaveCount(0);
+  await accountPage.close();
+
+  await page.goto("/interior-design-ai");
+  await expect(page.locator('script[src="https://accounts.google.com/gsi/client"]')).toHaveCount(1);
+  await expect.poll(() => page.evaluate(() => {
+    const calls = (window as unknown as { __googleOneTapCalls?: Array<{ type: string; config?: { auto_select?: boolean } }> }).__googleOneTapCalls ?? [];
+    return calls.map((call) => ({ type: call.type, autoSelect: call.config?.auto_select }));
+  })).toEqual([
+    { type: "initialize", autoSelect: false },
+    { type: "prompt", autoSelect: undefined },
+  ]);
 });
 
 test("signed-out purchase choices go to sign-in without calling checkout", async ({ page }) => {

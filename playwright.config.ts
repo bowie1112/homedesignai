@@ -14,8 +14,13 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 7"], channel: "chrome", viewport: { width: 390, height: 844 } } },
   ],
   webServer: {
-    command: "pnpm exec next dev --turbopack --hostname 127.0.0.1 --port 3107",
-    env: { NEXT_PUBLIC_APP_URL: "https://homedesignai.co" },
+    command: "node_modules/.bin/next dev --turbopack --hostname 127.0.0.1 --port 3107",
+    env: {
+      NEXT_PUBLIC_APP_URL: "https://homedesignai.co",
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: "playwright-client-id.apps.googleusercontent.com",
+      NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_playwright",
+    },
     url: "http://127.0.0.1:3107",
     reuseExistingServer: false,
     timeout: 120_000,
