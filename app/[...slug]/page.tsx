@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GeneratorWorkbench } from "@/components/generator-workbench";
+import { LegalPage } from "@/components/legal-page";
 import { ToolLandingPage } from "@/components/tool-landing-page";
 import { UnitConverter } from "@/components/unit-converter";
 import { converterPages, ideaPages, roomPages, toolMap, tools } from "@/lib/site";
@@ -37,8 +38,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (idea) return { title: idea.title, description: idea.summary, alternates: { canonical: `/ideas/${idea.slug}` } };
   const converter = slug[0] === "tools" ? converterPages.find((page) => page.slug === slug[1]) : undefined;
   if (converter) return { title: `${converter.title} Converter`, description: `Convert ${converter.from} to ${converter.to} instantly.`, alternates: { canonical: `/tools/${converter.slug}` } };
-  const titles: Record<string, string> = { privacy: "Privacy Policy", terms: "Terms of Service", affiliate: "Affiliate Program" };
-  if (titles[path]) return { title: titles[path], alternates: { canonical: `/${path}` } };
+  const legalMetadata: Record<string, { title: string; description: string }> = {
+    privacy: {
+      title: "Privacy Policy",
+      description: "How Home Design AI handles account data, private uploads, AI generation requests, payments, analytics, retention, and privacy choices.",
+    },
+    terms: {
+      title: "Terms of Service",
+      description: "The rules for using Home Design AI, including credits, subscriptions, refunds, acceptable use, AI outputs, and design disclaimers.",
+    },
+    affiliate: {
+      title: "Affiliate Program",
+      description: "Referral information for creators, educators, real-estate writers, and design communities that want to share Home Design AI.",
+    },
+  };
+  if (legalMetadata[path]) return { ...legalMetadata[path], alternates: { canonical: `/${path}` } };
   return { title: "Page" };
 }
 
@@ -92,23 +106,6 @@ function IdeaPage({ title, summary }: { title: string; summary: string }) {
 
 function ConverterPage({ converter }: { converter: (typeof converterPages)[number] }) {
   return <main id="main-content"><PageIntro eyebrow="Dimension tools" title={`${converter.title} Converter`} text={`Convert ${converter.from} to ${converter.to} while reading a plan, checking furniture dimensions, or preparing a design brief.`} /><section className="site-shell max-w-4xl py-16 sm:py-24"><UnitConverter factor={converter.factor} from={converter.from} to={converter.to} /><div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] sm:grid-cols-2"><div className="bg-[var(--white)] p-6"><h2 className="text-lg font-semibold">How it works</h2><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">Multiply the source measurement by {converter.factor}. Results are rounded to four decimal places when needed.</p></div><div className="bg-[var(--white)] p-6"><h2 className="text-lg font-semibold">Planning note</h2><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">For construction documents, keep one unit system throughout and confirm critical dimensions on site.</p></div></div></section></main>;
-}
-
-function LegalPage({ kind }: { kind: "privacy" | "terms" }) {
-  const isPrivacy = kind === "privacy";
-  const sections = isPrivacy ? [
-    ["Information we process", "Account details, uploaded images, generation prompts, billing references, and technical service logs needed to operate and secure the product."],
-    ["How images are handled", "Uploads and generated results are stored privately. Short-lived signed links may be shared with the generation provider only to complete your requested job."],
-    ["Payments", "Stripe processes payment details. Home Design AI stores billing identifiers and transaction status, not full card data."],
-    ["Your choices", "You may request access, correction, or deletion of account data by contacting support."],
-  ] : [
-    ["Concept use", "Outputs are exploratory design images, not architectural, engineering, construction, code, or permit documents."],
-    ["Credits", "Basic generations cost 1 credit and Pro generations cost 3 credits. Credits do not expire. Failed model jobs are eligible for automatic credit return."],
-    ["Acceptable use", "You may not use the service to infringe rights, bypass security, upload unlawful material, or misrepresent an AI concept as approved construction documentation."],
-    ["Availability", "We work to keep the service reliable, but model and payment providers may experience delays or outages."],
-  ];
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "hello@homedesignai.co";
-  return <main id="main-content"><PageIntro eyebrow="Legal" title={isPrivacy ? "Privacy Policy" : "Terms of Service"} text={`Plain-language ${isPrivacy ? "privacy information" : "terms"} for Home Design AI. Last updated July 10, 2026.`} /><article className="site-shell max-w-4xl py-16 sm:py-24"><div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">{sections.map(([title, text], index) => <section className="grid gap-4 py-7 sm:grid-cols-[44px_1fr]" key={title}><span className="text-xs font-bold text-[var(--blue)]">0{index + 1}</span><div><h2 className="text-xl font-semibold">{title}</h2><p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{text}</p></div></section>)}</div><p className="mt-8 text-sm">Questions? <a className="font-bold text-[var(--blue-deep)] underline" href={`mailto:${supportEmail}`}>{supportEmail}</a></p></article></main>;
 }
 
 function AffiliatePage() {

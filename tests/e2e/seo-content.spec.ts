@@ -32,12 +32,56 @@ test("commercial copy keeps free-credit and 3D output claims accurate", async ({
   await expect(page.getByText(/New accounts receive 3 signup credits/).first()).toBeVisible();
 });
 
+const legalPages = [
+  {
+    path: "/privacy",
+    title: "Privacy Policy | Home Design AI",
+    description: "How Home Design AI handles account data, private uploads, AI generation requests, payments, analytics, retention, and privacy choices.",
+    h1: "Privacy Policy",
+    headings: ["Information we collect", "AI generation and third-party processing", "Retention and deletion", "Your privacy choices and rights"],
+    marker: "third-party AI processing providers",
+    toc: "AI generation and third-party processing",
+  },
+  {
+    path: "/terms",
+    title: "Terms of Service | Home Design AI",
+    description: "The rules for using Home Design AI, including credits, subscriptions, refunds, acceptable use, AI outputs, and design disclaimers.",
+    h1: "Terms of Service",
+    headings: ["Credits, subscriptions, and billing", "Refunds and cancellations", "AI outputs", "Design and construction disclaimer"],
+    marker: "Failed model jobs are eligible for an automatic credit return",
+    toc: "Credits, subscriptions, and billing",
+  },
+] as const;
+
 test("public legal and affiliate pages expose self-referencing canonicals", async ({ page }) => {
-  for (const path of ["/affiliate", "/privacy", "/terms"]) {
+  for (const path of ["/affiliate", ...legalPages.map((legalPage) => legalPage.path)]) {
     await page.goto(path);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://homedesignai.co${path}`);
   }
 });
+
+for (const legalPage of legalPages) {
+  test(`${legalPage.path} exposes complete legal copy without internal provider names`, async ({ page, request }) => {
+    const response = await request.get(legalPage.path);
+    expect(response.ok()).toBe(true);
+    const html = await response.text();
+    expect(html).toContain("July 16, 2026");
+    expect(html).toContain(legalPage.marker);
+    expect(html).not.toMatch(/\bKIE\b|kie\.ai/i);
+
+    await page.goto(legalPage.path);
+    await expect(page).toHaveTitle(legalPage.title);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", legalPage.description);
+    await expect(page.getByRole("heading", { level: 1, name: legalPage.h1, exact: true })).toHaveCount(1);
+    await expect(page.getByText("Last updated July 16, 2026", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("On this page").getByRole("link", { name: new RegExp(legalPage.toc, "i") })).toBeVisible();
+    await expect(page.locator('a[href="mailto:hello@homedesignai.co"]').last()).toBeVisible();
+
+    for (const heading of legalPage.headings) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+  });
+}
 
 test("the sitemap lists only the 34 intended public URLs without synthetic lastmod values", async ({ request }) => {
   const response = await request.get("/sitemap.xml");
