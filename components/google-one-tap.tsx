@@ -18,6 +18,7 @@ declare global {
 }
 
 const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const hasSupabasePublicEnv = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
 
 export function GoogleOneTap() {
   const pathname = usePathname();
@@ -26,7 +27,7 @@ export function GoogleOneTap() {
   const eligible = shouldShowGoogleOneTap(pathname);
 
   useEffect(() => {
-    if (!clientId || !eligible || !scriptReady || !window.google) return;
+    if (!clientId || !hasSupabasePublicEnv || !eligible || !scriptReady || !window.google) return;
 
     let disposed = false;
     let stop: (() => void) | undefined;
@@ -56,7 +57,7 @@ export function GoogleOneTap() {
     };
   }, [eligible, router, scriptReady]);
 
-  if (!clientId || !eligible) return null;
+  if (!clientId || !hasSupabasePublicEnv || !eligible) return null;
   return (
     <Script
       id="google-identity-services"

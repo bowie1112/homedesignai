@@ -5,7 +5,21 @@ import { useState } from "react";
 import { trackGaEvent, trackProductEvent } from "@/lib/analytics";
 import type { PaymentPlanId } from "@/lib/payments/plans";
 
-export function BillingButton({ authenticated, planId, children, variant = "primary" }: { authenticated: boolean; planId: PaymentPlanId; children: React.ReactNode; variant?: "primary" | "secondary" }) {
+export function BillingButton({
+  authenticated,
+  buttonClassName,
+  buttonStyle,
+  planId,
+  children,
+  variant = "primary",
+}: {
+  authenticated: boolean;
+  buttonClassName?: string;
+  buttonStyle?: React.CSSProperties;
+  planId: PaymentPlanId;
+  children: React.ReactNode;
+  variant?: "primary" | "secondary";
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +58,7 @@ export function BillingButton({ authenticated, planId, children, variant = "prim
 
   return (
     <div>
-      <button className={`w-full ${variant === "primary" ? "button-primary" : "button-secondary"}`} disabled={loading} onClick={checkout} type="button">
+      <button className={`w-full ${variant === "primary" ? "button-primary" : "button-secondary"} ${buttonClassName ?? ""}`} disabled={loading} onClick={checkout} style={buttonStyle} type="button">
         {loading ? <LoaderCircle className="animate-spin" size={16} /> : null}
         {loading ? "Opening secure checkout…" : children}
       </button>

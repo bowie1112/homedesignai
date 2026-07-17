@@ -19,7 +19,7 @@ export function PricingSection({ authenticated = false, compact = false }: { aut
           </div>
           <div className="grid gap-px bg-[color:oklch(74%_0.02_257/0.35)] sm:grid-cols-2">
             {plans.map((plan) => (
-              <article className={`relative p-6 sm:p-8 ${plan.featured ? "bg-[var(--blue)] text-white" : compact ? "bg-[var(--white)]" : "bg-[color:oklch(26%_0.035_257)]"}`} key={plan.id}>
+              <article className={`relative flex flex-col p-6 sm:p-8 ${plan.featured ? "bg-[var(--blue)] text-white" : compact ? "bg-[var(--white)]" : "bg-[color:oklch(26%_0.035_257)]"}`} key={plan.id}>
                 {plan.featured ? <span className="absolute right-4 top-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[color:oklch(88%_0.04_258)]">Best value</span> : null}
                 <h3 className="text-sm font-bold uppercase tracking-[0.1em]">{plan.id === "starter" ? "Starter" : "Pro"}</h3>
                 <div className="mt-7 flex items-end gap-2">
@@ -33,11 +33,19 @@ export function PricingSection({ authenticated = false, compact = false }: { aut
                     <li className="flex items-center gap-2 text-sm" key={feature}><Check size={15} /> {feature}</li>
                   ))}
                 </ul>
-                <div className="mt-8">
+                <div className="mt-auto pt-8">
                   {compact ? (
-                    <BillingButton authenticated={authenticated} planId={plan.id} variant={plan.featured ? "primary" : "secondary"}>Choose {plan.id === "starter" ? "Starter" : "Pro"}</BillingButton>
+                    <BillingButton
+                      authenticated={authenticated}
+                      buttonClassName={plan.featured ? "border-white bg-white" : undefined}
+                      buttonStyle={plan.featured ? { color: "var(--blue-deep)" } : undefined}
+                      planId={plan.id}
+                      variant="secondary"
+                    >
+                      Choose {plan.id === "starter" ? "Starter" : "Pro"} {plan.featured ? <MoveRight size={16} /> : null}
+                    </BillingButton>
                   ) : (
-                    <Link className={`w-full ${plan.featured ? "button-secondary border-white bg-white text-[var(--blue-deep)]" : "button-primary"}`} href={`/pricing?plan=${plan.id}`}>
+                    <Link className={`w-full ${plan.featured ? "button-secondary border-white bg-white" : "button-primary"}`} href={`/pricing?plan=${plan.id}`} style={plan.featured ? { color: "var(--blue-deep)" } : undefined}>
                       Choose {plan.id === "starter" ? "Starter" : "Pro"} <MoveRight size={16} />
                     </Link>
                   )}
