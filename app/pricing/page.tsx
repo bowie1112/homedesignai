@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { CircleDollarSign } from "lucide-react";
-import { BillingButton } from "@/components/billing-button";
 import { PageIntro } from "@/components/page-intro";
 import { PricingSection } from "@/components/pricing-section";
-import { formatUsd, paymentPlans } from "@/lib/payments/plans";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Pricing", description: "Permanent Home Design AI credits through monthly plans and one-off packs.", alternates: { canonical: "/pricing" } };
+export const metadata: Metadata = { title: "Pricing", description: "Monthly and yearly Home Design AI plans, plus permanent one-time credit packs.", alternates: { canonical: "/pricing" } };
 
 export default async function PricingPage() {
-  const packs = [paymentPlans.pack_40, paymentPlans.pack_120, paymentPlans.pack_300];
   let authenticated = false;
   try {
     const supabase = await createServerSupabaseClient();
@@ -20,16 +16,18 @@ export default async function PricingPage() {
   }
   return (
     <main id="main-content">
-      <PageIntro eyebrow="Simple, permanent credits" title="Pay for ideas, not empty months." text="Choose a monthly plan for an ongoing balance or add a one-off pack. Credits accumulate and never expire." />
+      <PageIntro eyebrow="Flexible plans and credits" title="Choose how your ideas are funded." text="Subscribe monthly, save with annual billing, or add a permanent one-time credit pack." />
       <section className="site-shell py-16 sm:py-24">
         <PricingSection authenticated={authenticated} compact />
-        <div className="mt-16 grid gap-5 lg:grid-cols-[0.75fr_1.25fr]">
-          <div><span className="eyebrow">Credit packs</span><h2 className="section-title mt-5">Add more only when you need them.</h2></div>
-          <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] sm:grid-cols-3">
-            {packs.map((pack) => <article className="bg-[var(--white)] p-6" key={pack.id}><CircleDollarSign className="text-[var(--blue)]" size={22} /><div className="mt-10 text-4xl font-semibold tracking-[-0.05em]">{pack.creditsPerInvoice}</div><p className="mt-1 text-sm text-[var(--ink-soft)]">permanent credits</p><div className="mt-5 text-xl font-semibold">{formatUsd(pack.amount)}</div><div className="mt-5"><BillingButton authenticated={authenticated} planId={pack.id} variant="secondary">Buy {pack.creditsPerInvoice} credits</BillingButton></div></article>)}
+        <div className="mt-14 border border-[var(--line)] bg-[var(--blue-pale)] p-6">
+          <h2 className="text-lg font-semibold">How billing and credits work</h2>
+          <div className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+            <p><strong>Monthly:</strong> Credits are added after every successful monthly renewal and accumulate in your account.</p>
+            <p><strong>Yearly:</strong> The full annual credit allowance is added after the annual payment.</p>
+            <p><strong>One-time:</strong> Pack credits are permanent and never expire while your account remains active.</p>
+            <p><strong>Refunds:</strong> A first purchase may be refundable within 7 days only when all paid credits remain unused.</p>
           </div>
         </div>
-        <div className="mt-14 border border-[var(--line)] bg-[var(--blue-pale)] p-6"><h2 className="text-lg font-semibold">How free generations and credits are used</h2><div className="mt-4 grid gap-4 text-sm sm:grid-cols-2"><p><strong>Basic:</strong> Registered users get 3 free generations each UTC day, then pay 1 permanent credit per generation.</p><p><strong>Pro:</strong> Nano Banana 2 at 2K always costs 3 permanent credits per generation.</p></div></div>
       </section>
     </main>
   );

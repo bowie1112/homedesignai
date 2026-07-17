@@ -103,11 +103,15 @@ test("Google One Tap initializes on acquisition pages and stays off account page
 
 test("signed-out purchase choices go to sign-in without calling checkout", async ({ page }) => {
   const choices = [
-    { name: "Choose Starter", plan: "starter" },
-    { name: "Choose Pro", plan: "pro" },
-    { name: "Buy 40 credits", plan: "pack_40" },
-    { name: "Buy 120 credits", plan: "pack_120" },
-    { name: "Buy 300 credits", plan: "pack_300" },
+    { mode: "Monthly", name: "Choose Starter", plan: "starter_monthly" },
+    { mode: "Monthly", name: "Choose Professional", plan: "professional_monthly" },
+    { mode: "Monthly", name: "Choose Enterprise", plan: "enterprise_monthly" },
+    { mode: "Yearly Save 50%", name: "Choose Starter", plan: "starter_yearly" },
+    { mode: "Yearly Save 50%", name: "Choose Professional", plan: "professional_yearly" },
+    { mode: "Yearly Save 50%", name: "Choose Enterprise", plan: "enterprise_yearly" },
+    { mode: "One-time", name: "Buy Starter pack", plan: "pack_starter" },
+    { mode: "One-time", name: "Buy Professional pack", plan: "pack_professional" },
+    { mode: "One-time", name: "Buy Enterprise pack", plan: "pack_enterprise" },
   ];
   let checkoutRequests = 0;
   page.on("request", (request) => {
@@ -116,11 +120,27 @@ test("signed-out purchase choices go to sign-in without calling checkout", async
 
   for (const choice of choices) {
     await page.goto("/pricing");
+    if (choice.mode !== "Monthly") await page.getByRole("tab", { name: choice.mode, exact: true }).click();
     await page.getByRole("button", { name: choice.name, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/auth/sign-in\\?next=.*${choice.plan}`));
   }
 
   expect(checkoutRequests).toBe(0);
+});
+
+test("pricing tabs expose monthly, yearly, and permanent credit details", async ({ page }) => {
+  await page.goto("/pricing");
+  await expect(page.getByRole("tab", { name: "Monthly", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByText("$19.99", { exact: true })).toBeVisible();
+  await expect(page.getByText("200 credits each month", { exact: true })).toBeVisible();
+
+  await page.getByRole("tab", { name: "Yearly Save 50%", exact: true }).click();
+  await expect(page.getByText("$119 billed annually", { exact: true })).toBeVisible();
+  await expect(page.getByText("18,000 credits granted annually", { exact: true })).toBeVisible();
+
+  await page.getByRole("tab", { name: "One-time", exact: true }).click();
+  await expect(page.getByText("1,500 permanent credits", { exact: true })).toBeVisible();
+  await expect(page.getByText("Credits never expire", { exact: true }).first()).toBeVisible();
 });
 
 test("signed-out account renders billing guidance instead of the Stripe portal", async ({ page }) => {
