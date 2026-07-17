@@ -98,8 +98,8 @@ export function SignInCard({ nextPath = "/account" }: { nextPath?: string }) {
 
       {mode !== "recovery" ? (
         <div className="mt-7 grid grid-cols-2 border border-[var(--line)] p-1" role="tablist" aria-label="Account action">
-          <button aria-selected={mode === "sign-in"} className={`min-h-10 px-3 text-sm font-bold ${mode === "sign-in" ? "bg-[var(--ink)] text-[var(--paper)]" : "text-[var(--ink-soft)]"}`} onClick={() => changeMode("sign-in")} role="tab" type="button">Sign in</button>
-          <button aria-selected={mode === "sign-up"} className={`min-h-10 px-3 text-sm font-bold ${mode === "sign-up" ? "bg-[var(--ink)] text-[var(--paper)]" : "text-[var(--ink-soft)]"}`} onClick={() => changeMode("sign-up")} role="tab" type="button">Create account</button>
+          <button aria-selected={mode === "sign-in"} className={`min-h-10 px-3 text-sm font-bold ${mode === "sign-in" ? "bg-[var(--ink)]" : "text-[var(--ink-soft)]"}`} onClick={() => changeMode("sign-in")} role="tab" style={mode === "sign-in" ? { color: "var(--paper)" } : undefined} type="button">Sign in</button>
+          <button aria-selected={mode === "sign-up"} className={`min-h-10 px-3 text-sm font-bold ${mode === "sign-up" ? "bg-[var(--ink)]" : "text-[var(--ink-soft)]"}`} onClick={() => changeMode("sign-up")} role="tab" style={mode === "sign-up" ? { color: "var(--paper)" } : undefined} type="button">Create account</button>
         </div>
       ) : null}
 
