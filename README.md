@@ -6,7 +6,7 @@ Production-oriented MVP for AI floor plans and home-design concept images. Built
 
 1. Install dependencies with `pnpm install`.
 2. Copy `.env.example` to `.env.local` and fill in the provider credentials.
-3. Create a Supabase project and apply `supabase/migrations/202607100001_initial.sql`.
+3. Create a Supabase project and apply all migrations in `supabase/migrations` in timestamp order.
 4. In Supabase Auth, enable Google OAuth and add `http://localhost:3000/auth/callback` plus the production callback URL.
 5. Configure the Stripe secret and webhook keys from `.env.example`. Checkout prices are defined in `lib/payments/plans.ts`; no Dashboard Product or Price setup is required. Point a Stripe webhook at `/api/webhooks/stripe` for:
    - `checkout.session.completed`
@@ -19,7 +19,7 @@ Production-oriented MVP for AI floor plans and home-design concept images. Built
 
 ## Provider behavior
 
-- Basic: `nano-banana-2` at 1K, 1 site credit.
+- Basic: `nano-banana-2` at 1K. Registered users receive 3 free generations per UTC day, then each generation costs 1 permanent site credit.
 - Pro: `nano-banana-2`, fixed 2K, 3 site credits.
 - The browser uploads input images directly to a short-lived Supabase signed upload URL, avoiding Vercel request-size limits. Inputs and final results live in the private `private-assets` bucket.
 - KIE callbacks are verified and treated as signals. Final state is confirmed with `recordInfo`.

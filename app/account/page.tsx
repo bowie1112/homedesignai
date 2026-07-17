@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageIntro } from "@/components/page-intro";
 import { PortalButton } from "@/components/portal-button";
 import { SignOutButton } from "@/components/sign-out-button";
+import { getAccountUsage } from "@/lib/account-usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -10,6 +11,7 @@ export const metadata: Metadata = { title: "Account", robots: { index: false, fo
 
 export default async function AccountPage() {
   let balance: number | null = null;
+  let dailyFreeRemaining: number | null = null;
   let subscription: { status: string; current_period_end: string | null } | null = null;
   let stripeCustomerId: string | null = null;
   let signedIn = false;
@@ -19,12 +21,13 @@ export default async function AccountPage() {
     if (user) {
       signedIn = true;
       const admin = createAdminClient();
-      const [accountResult, subscriptionResult, profileResult] = await Promise.all([
-        admin.from("credit_accounts").select("balance").eq("user_id", user.id).maybeSingle(),
+      const [usage, subscriptionResult, profileResult] = await Promise.all([
+        getAccountUsage(user.id),
         admin.from("subscriptions").select("status, current_period_end").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
         admin.from("profiles").select("stripe_customer_id").eq("id", user.id).maybeSingle(),
       ]);
-      balance = accountResult.data?.balance ?? 0;
+      balance = usage.creditBalance;
+      dailyFreeRemaining = usage.dailyFreeRemaining;
       subscription = subscriptionResult.data;
       stripeCustomerId = profileResult.data?.stripe_customer_id ?? null;
     }
@@ -33,7 +36,7 @@ export default async function AccountPage() {
   }
   return (
     <main id="main-content">
-      <PageIntro eyebrow="Account" title="Credits and billing" text="Review your current balance, subscription, and payment settings." />
+      <PageIntro eyebrow="Account" title="Usage, credits, and billing" text="Review today’s free Basic generations, your permanent credit balance, and payment settings." />
       <section className="site-shell py-16 sm:py-24">
         {!signedIn ? (
           <div className="mb-5 border border-[var(--line)] bg-[var(--blue-pale)] p-4 text-sm">
@@ -41,9 +44,14 @@ export default async function AccountPage() {
             <Link className="ml-1 font-bold text-[var(--blue-deep)] underline" href="/auth/sign-in">Sign in or create an account</Link>
           </div>
         ) : <div className="mb-5 flex justify-end"><SignOutButton /></div>}
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <article className="paper-panel p-6">
-            <span className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--ink-soft)]">Credit balance</span>
+            <span className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--ink-soft)]">Free Basic today</span>
+            <div className="mt-8 text-5xl font-semibold tabular-nums tracking-[-0.06em]">{dailyFreeRemaining ?? "—"}<span className="ml-2 text-xl text-[var(--ink-soft)]">/ 3</span></div>
+            <p className="mt-2 text-sm text-[var(--ink-soft)]">Remaining generations. Resets at 00:00 UTC.</p>
+          </article>
+          <article className="paper-panel p-6">
+            <span className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--ink-soft)]">Permanent credits</span>
             <div className="mt-8 text-5xl font-semibold tabular-nums tracking-[-0.06em]">{balance ?? "—"}</div>
             <p className="mt-2 text-sm text-[var(--ink-soft)]">Permanent credits available to use.</p>
           </article>

@@ -39,7 +39,7 @@ export function ToolLandingPage({ tool }: { tool: ToolDefinition }) {
               <Link className="button-secondary" href="/pricing">View credit pricing</Link>
             </div>
             <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-[var(--ink-soft)]">
-              <span className="flex items-center gap-2"><Check className="text-[var(--green)]" size={15} /> 3 credits at signup</span>
+              <span className="flex items-center gap-2"><Check className="text-[var(--green)]" size={15} /> 3 free Basic generations daily</span>
               <span className="flex items-center gap-2"><ShieldCheck className="text-[var(--blue)]" size={15} /> Private uploads</span>
               <span className="flex items-center gap-2"><WandSparkles className="text-[var(--blue)]" size={15} /> Basic and Pro</span>
             </div>

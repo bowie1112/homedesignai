@@ -14,7 +14,7 @@ const copy: Record<AuthMode, { title: string; description: string; action: strin
   },
   "sign-up": {
     title: "Create your private design desk.",
-    description: "New accounts receive three permanent credits after email verification.",
+    description: "Registered accounts receive three free Basic generations every day.",
     action: "Create account",
   },
   recovery: {

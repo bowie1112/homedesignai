@@ -8,7 +8,7 @@ type LegalSection = {
 };
 
 const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "hello@homedesignai.co";
-const lastUpdated = "July 16, 2026";
+const lastUpdated = "July 17, 2026";
 
 const privacySections: LegalSection[] = [
   {
@@ -164,7 +164,7 @@ const termsSections: LegalSection[] = [
     id: "credits-billing",
     title: "Credits, subscriptions, and billing",
     body: [
-      "Home Design AI uses credits for AI generations. New accounts may receive 3 signup credits. Basic generations cost 1 credit. Pro generations cost 3 credits. Credits do not expire while your account remains active, but they have no cash value and are not transferable unless we say otherwise in writing.",
+      "Registered accounts receive up to 3 free Basic generations each UTC day. Unused daily generations do not accumulate or transfer. After the daily allowance is used, Basic generations cost 1 permanent credit. Pro generations always cost 3 permanent credits. Permanent credits do not expire while your account remains active, but they have no cash value and are not transferable unless we say otherwise in writing.",
       "We offer one-time credit packs and monthly subscriptions. Subscription credits are granted according to the plan terms and accumulate in your account. Subscriptions renew automatically until canceled. You can manage payment methods and cancel subscriptions through Stripe's secure billing portal when available in your account.",
       "Prices, plan names, included credits, taxes, and supported payment methods may change. If a payment fails, we may pause credit grants, subscription access, or billing-related features until payment is resolved.",
     ],
@@ -173,7 +173,7 @@ const termsSections: LegalSection[] = [
     id: "refunds",
     title: "Refunds and cancellations",
     body: [
-      "Failed model jobs are eligible for an automatic credit return when our systems determine the generation was not completed successfully.",
+      "When our systems determine that a model job did not complete successfully, a consumed daily Basic generation or the permanent credits charged for that job are automatically returned.",
       "For paid purchases, your first purchase may be refunded within 7 days only if the associated paid credits are wholly unused. Used credits, renewal charges, partially used purchases, subscription periods that have already started, and consumed generations are not refundable unless required by law or unless we confirm a duplicate charge or documented billing error.",
       "Canceling a subscription stops future renewals; it does not automatically refund the current billing period or remove credits already granted, unless applicable law requires otherwise.",
     ],

@@ -42,9 +42,9 @@ describe("priority landing-page SEO content", () => {
 
   it("states the credit and image-only limits without targeting model generators", () => {
     const copy = searchableCopy();
-    expect(copy).toContain("3 signup credits");
-    expect(copy).toContain("basic generation costs 1 credit");
-    expect(copy).toContain("pro 2k generation costs 3 credits");
+    expect(copy).toContain("3 free basic generations each utc day");
+    expect(copy).toContain("basic costs 1 permanent credit");
+    expect(copy).toContain("pro 2k always costs 3 permanent credits");
     expect(copy).toContain("does not create an editable 3d model");
     expect(copy).toContain("rendered image rather than a model file");
     expect(copy).not.toMatch(/ai 3d model generator|image to 3d model|text to 3d model|3d asset|3d model service|3d model company/i);

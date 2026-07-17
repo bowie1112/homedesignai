@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
+import { getAccountUsage } from "@/lib/account-usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createKieTask, getKieTask, KieApiError, parseKieResultUrls } from "@/lib/kie/client";
-import { generationInputSchema, type GenerationInput, type GenerationJobRow } from "@/lib/generation/types";
+import { generationInputSchema, type GenerationChargeSource, type GenerationInput, type GenerationJobRow } from "@/lib/generation/types";
 
 const STORAGE_BUCKET = "private-assets";
 const MAX_RESULT_BYTES = 50 * 1024 * 1024;
@@ -82,7 +83,34 @@ export async function reserveGeneration(userId: string, rawInput: GenerationInpu
     if (error.message.includes("INSUFFICIENT_CREDITS")) throw new Error("You do not have enough credits for this model. Choose Basic or add credits.");
     throw new Error(`Credits could not be reserved: ${error.message}`);
   }
-  return { jobId: (data as string | null) ?? jobId, input };
+  const reservedJobId = (data as string | null) ?? jobId;
+  let reservedJob: { charge_source: GenerationChargeSource; credit_cost: number; daily_quota_date: string | null };
+  let dailyFreeRemaining: number;
+  try {
+    const [jobResult, usage] = await Promise.all([
+      admin
+        .from("generation_jobs")
+        .select("charge_source, credit_cost, daily_quota_date")
+        .eq("id", reservedJobId)
+        .eq("user_id", userId)
+        .single(),
+      getAccountUsage(userId),
+    ]);
+    if (jobResult.error || !jobResult.data) throw new Error(`The generation charge could not be confirmed: ${jobResult.error?.message ?? "missing job"}`);
+    reservedJob = jobResult.data as typeof reservedJob;
+    dailyFreeRemaining = usage.dailyFreeRemaining;
+  } catch (cause) {
+    await refundGeneration(reservedJobId, "RESERVATION_CONFIRMATION_FAILED").catch(() => undefined);
+    throw cause;
+  }
+  return {
+    jobId: reservedJobId,
+    input,
+    chargeSource: reservedJob.charge_source,
+    creditCost: reservedJob.credit_cost,
+    dailyQuotaDate: reservedJob.daily_quota_date,
+    dailyFreeRemaining,
+  };
 }
 
 export async function refundGeneration(jobId: string, reason: string) {
@@ -128,7 +156,7 @@ export async function startProviderTask(job: GenerationJobRow, input?: Generatio
 export async function createGeneration(userId: string, input: GenerationInput) {
   const parsedForOwnership = generationInputSchema.parse(input);
   const preparedSignedUrls = await createSignedInputUrls(userId, parsedForOwnership.inputAssetIds);
-  const { jobId, input: parsedInput } = await reserveGeneration(userId, parsedForOwnership);
+  const { jobId, input: parsedInput, chargeSource, creditCost, dailyQuotaDate, dailyFreeRemaining } = await reserveGeneration(userId, parsedForOwnership);
   const job: GenerationJobRow = {
     id: jobId,
     user_id: userId,
@@ -140,7 +168,9 @@ export async function createGeneration(userId: string, input: GenerationInput) {
     style: parsedInput.style,
     aspect_ratio: parsedInput.aspectRatio,
     status: "queued",
-    credit_cost: parsedInput.tier === "basic" ? 1 : 3,
+    credit_cost: creditCost,
+    charge_source: chargeSource,
+    daily_quota_date: dailyQuotaDate,
     kie_task_id: null,
     provider_state: null,
     provider_credits_consumed: null,
@@ -153,7 +183,7 @@ export async function createGeneration(userId: string, input: GenerationInput) {
     updated_at: new Date().toISOString(),
   };
   const started = await startProviderTask(job, parsedInput, preparedSignedUrls);
-  return { id: jobId, status: started.status };
+  return { id: jobId, status: started.status, chargeSource, dailyFreeRemaining };
 }
 
 async function persistResult(job: GenerationJobRow, sourceUrl: string) {

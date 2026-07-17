@@ -55,7 +55,7 @@ export function SiteHeader() {
   return (
     <>
       <div className="relative z-[70] flex min-h-10 items-center justify-center bg-[var(--ink)] px-4 py-2 text-center text-xs font-medium text-[var(--paper)]">
-        <span>New accounts receive 3 permanent credits.</span>
+        <span>Registered users get 3 free Basic generations every day.</span>
         <Link className="ml-2 inline-flex items-center gap-1 font-bold underline-offset-4 hover:underline" href="/pricing">
           View plans <MoveRight size={13} />
         </Link>

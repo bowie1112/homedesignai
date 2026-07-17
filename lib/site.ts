@@ -198,7 +198,7 @@ export const tools: ToolDefinition[] = [
       },
     ],
     commercialQuestions: [
-      { question: "How much does a 3D floor plan rendering cost?", answer: "New accounts receive 3 signup credits. A Basic generation costs 1 credit, while a Pro 2K generation costs 3 credits. The pricing page lists current subscription and credit-pack options." },
+      { question: "How much does a 3D floor plan rendering cost?", answer: "Registered users receive 3 free Basic generations each UTC day. After that daily allowance, Basic costs 1 permanent credit. Pro 2K always costs 3 permanent credits. The pricing page lists current subscription and credit-pack options." },
       { question: "Do I need 3D modeling software?", answer: "No modeling software is required for this image workflow. Upload the plan and describe the presentation you want; the result remains a rendered image rather than a model file." },
       { question: "When should I choose Pro 2K?", answer: "Use Pro 2K for a client review, listing presentation, or material study where small room details need to remain legible. Basic is better for rapid experimentation." },
     ],
@@ -397,7 +397,7 @@ export const navGroups = [
 export const featureStats = [
   { label: "Model tiers", value: "2" },
   { label: "Design tools", value: "12" },
-  { label: "Signup credits", value: "3" },
+  { label: "Free Basic / day", value: "3" },
 ];
 
 export const homeHighlights = [
@@ -432,12 +432,12 @@ export const faqs = [
   {
     question: "What is the difference between Basic and Pro?",
     answer:
-      "Basic uses Nano Banana 2 Lite and costs 1 credit. Pro uses Nano Banana 2 at a fixed 2K output and costs 3 credits. Pro is the better choice for final presentation images.",
+      "Basic uses Nano Banana 2 Lite. Registered users receive 3 free Basic generations each UTC day, then Basic costs 1 permanent credit. Pro uses Nano Banana 2 at a fixed 2K output and always costs 3 permanent credits.",
   },
   {
     question: "Do credits expire?",
     answer:
-      "No. Signup, subscription, and credit-pack balances accumulate and remain available until you use them.",
+      "Permanent subscription and credit-pack balances remain available until you use them. Daily free Basic generations reset at 00:00 UTC and do not accumulate.",
   },
   {
     question: "Can I create an editable 3D model?",

@@ -29,7 +29,7 @@ test("commercial copy keeps free-credit and 3D output claims accurate", async ({
   await expect(page.getByText("It does not create an editable 3D model, BIM file, CAD file, or geometry you can orbit and revise in professional modeling software.")).toBeVisible();
   await page.locator("details").filter({ hasText: "Is a floorplan render a downloadable 3D model?" }).locator("summary").click();
   await expect(page.getByText("Downloaded results are images intended for visualization and communication.", { exact: false })).toBeVisible();
-  await expect(page.getByText(/New accounts receive 3 signup credits/).first()).toBeVisible();
+  await expect(page.getByText(/Registered users receive 3 free Basic generations each UTC day/).first()).toBeVisible();
 });
 
 const legalPages = [
@@ -48,7 +48,7 @@ const legalPages = [
     description: "The rules for using Home Design AI, including credits, subscriptions, refunds, acceptable use, AI outputs, and design disclaimers.",
     h1: "Terms of Service",
     headings: ["Credits, subscriptions, and billing", "Refunds and cancellations", "AI outputs", "Design and construction disclaimer"],
-    marker: "Failed model jobs are eligible for an automatic credit return",
+    marker: "a consumed daily Basic generation or the permanent credits charged for that job are automatically returned",
     toc: "Credits, subscriptions, and billing",
   },
 ] as const;
@@ -65,7 +65,7 @@ for (const legalPage of legalPages) {
     const response = await request.get(legalPage.path);
     expect(response.ok()).toBe(true);
     const html = await response.text();
-    expect(html).toContain("July 16, 2026");
+    expect(html).toContain("July 17, 2026");
     expect(html).toContain(legalPage.marker);
     expect(html).not.toMatch(/\bKIE\b|kie\.ai/i);
 
@@ -73,7 +73,7 @@ for (const legalPage of legalPages) {
     await expect(page).toHaveTitle(legalPage.title);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", legalPage.description);
     await expect(page.getByRole("heading", { level: 1, name: legalPage.h1, exact: true })).toHaveCount(1);
-    await expect(page.getByText("Last updated July 16, 2026", { exact: true })).toBeVisible();
+    await expect(page.getByText("Last updated July 17, 2026", { exact: true })).toBeVisible();
     await expect(page.getByLabel("On this page").getByRole("link", { name: new RegExp(legalPage.toc, "i") })).toBeVisible();
     await expect(page.locator('a[href="mailto:hello@homedesignai.co"]').last()).toBeVisible();
 

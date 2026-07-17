@@ -29,7 +29,7 @@ export default async function PricingPage() {
             {packs.map((pack) => <article className="bg-[var(--white)] p-6" key={pack.id}><CircleDollarSign className="text-[var(--blue)]" size={22} /><div className="mt-10 text-4xl font-semibold tracking-[-0.05em]">{pack.creditsPerInvoice}</div><p className="mt-1 text-sm text-[var(--ink-soft)]">permanent credits</p><div className="mt-5 text-xl font-semibold">{formatUsd(pack.amount)}</div><div className="mt-5"><BillingButton authenticated={authenticated} planId={pack.id} variant="secondary">Buy {pack.creditsPerInvoice} credits</BillingButton></div></article>)}
           </div>
         </div>
-        <div className="mt-14 border border-[var(--line)] bg-[var(--blue-pale)] p-6"><h2 className="text-lg font-semibold">How credits are used</h2><div className="mt-4 grid gap-4 text-sm sm:grid-cols-2"><p><strong>Basic:</strong> Nano Banana 2 Lite, 1 credit per generation.</p><p><strong>Pro:</strong> Nano Banana 2 at 2K, 3 credits per generation.</p></div></div>
+        <div className="mt-14 border border-[var(--line)] bg-[var(--blue-pale)] p-6"><h2 className="text-lg font-semibold">How free generations and credits are used</h2><div className="mt-4 grid gap-4 text-sm sm:grid-cols-2"><p><strong>Basic:</strong> Registered users get 3 free generations each UTC day, then pay 1 permanent credit per generation.</p><p><strong>Pro:</strong> Nano Banana 2 at 2K always costs 3 permanent credits per generation.</p></div></div>
       </section>
     </main>
   );

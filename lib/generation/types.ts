@@ -16,6 +16,7 @@ export const generationInputSchema = z.object({
 export type GenerationInput = z.infer<typeof generationInputSchema>;
 
 export type GenerationJobStatus = "queued" | "processing" | "delayed" | "persisting" | "success" | "failed" | "refunded";
+export type GenerationChargeSource = "daily_free" | "credits";
 
 export type GenerationJobRow = {
   id: string;
@@ -29,6 +30,8 @@ export type GenerationJobRow = {
   aspect_ratio: string;
   status: GenerationJobStatus;
   credit_cost: number;
+  charge_source: GenerationChargeSource;
+  daily_quota_date: string | null;
   kie_task_id: string | null;
   provider_state: string | null;
   provider_credits_consumed: number | null;

@@ -36,6 +36,12 @@ type GenerationResponse = {
   error?: string | null;
   tool?: string;
   tier?: "basic" | "pro";
+  chargeSource?: "daily_free" | "credits";
+  dailyFreeRemaining?: number;
+};
+
+type AccountUsageResponse = {
+  dailyFreeRemaining: number;
 };
 
 class ProviderGenerationError extends Error {}
@@ -82,6 +88,7 @@ export function GeneratorWorkbench({
   const [status, setStatus] = useState<JobStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<GenerationResponse | null>(null);
+  const [dailyFreeRemaining, setDailyFreeRemaining] = useState<number | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const tool = toolMap.get(activeTool) ?? toolMap.get("floor-plan-generator")!;
@@ -96,6 +103,25 @@ export function GeneratorWorkbench({
   useEffect(() => () => {
     imageUrls.forEach(({ url }) => URL.revokeObjectURL(url));
   }, [imageUrls]);
+
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+    void import("@/lib/supabase/client")
+      .then(({ createClient }) => createClient().auth.getSession())
+      .then(({ data }) => data.session
+        ? fetch("/api/account/usage", { cache: "no-store", signal: controller.signal })
+        : null)
+      .then(async (response) => response?.ok ? await response.json() as AccountUsageResponse : null)
+      .then((usage) => {
+        if (active && usage) setDailyFreeRemaining(usage.dailyFreeRemaining);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, []);
 
   const selectTool = (nextTool: ToolKey) => {
     setActiveTool(nextTool);
@@ -178,6 +204,7 @@ export function GeneratorWorkbench({
         throw new Error(payload.message ?? payload.error ?? "We could not start this design. No credits were used.");
       }
       startedJobId = payload.id;
+      if (typeof payload.dailyFreeRemaining === "number") setDailyFreeRemaining(payload.dailyFreeRemaining);
       setResult(payload);
       setStatus(payload.status);
       failureStage = "poll";
@@ -340,7 +367,9 @@ export function GeneratorWorkbench({
                     {option === "pro" ? <Zap size={13} /> : <Sparkles size={13} />}
                   </span>
                   <span className={`mt-0.5 block ${tier === option ? "text-[color:oklch(82%_0.025_84)]" : "text-[var(--ink-soft)]"}`}>
-                    {option === "basic" ? "1 credit · fast" : "3 credits · 2K"}
+                    {option === "basic"
+                      ? `${dailyFreeRemaining === null ? "3 free/day" : `${dailyFreeRemaining} free left`} · then 1 credit`
+                      : "3 credits · 2K"}
                   </span>
                 </button>
               ))}

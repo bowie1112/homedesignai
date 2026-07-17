@@ -14,7 +14,7 @@ export function PricingSection({ authenticated = false, compact = false }: { aut
             <span className={`eyebrow ${compact ? "" : "text-[color:oklch(76%_0.1_258)]"}`}>Simple pricing</span>
             <h2 className={`section-title mt-5 ${compact ? "" : "text-[var(--paper)]"}`}>Credits that wait for your next idea.</h2>
             <p className={`lede mt-6 ${compact ? "" : "text-[color:oklch(79%_0.02_84)]"}`}>
-              Subscribe for a monthly balance or add a one-off pack. Every credit accumulates and stays available.
+              Start with 3 free Basic generations daily, then use permanent monthly or one-off credits whenever you need more.
             </p>
           </div>
           <div className="grid gap-px bg-[color:oklch(74%_0.02_257/0.35)] sm:grid-cols-2">
