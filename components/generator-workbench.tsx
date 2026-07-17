@@ -328,9 +328,11 @@ export function GeneratorWorkbench({
             <div className="grid grid-cols-2 border border-[var(--line)] p-1">
               {(["basic", "pro"] as const).map((option) => (
                 <button
-                  className={`min-h-12 px-3 text-left text-xs transition-colors ${tier === option ? "bg-[var(--ink)] text-[var(--paper)]" : "hover:bg-[var(--paper)]"}`}
+                  aria-pressed={tier === option}
+                  className={`min-h-12 px-3 text-left text-xs transition-colors ${tier === option ? "bg-[var(--ink)]" : "hover:bg-[var(--paper)]"}`}
                   key={option}
                   onClick={() => setTier(option)}
+                  style={tier === option ? { color: "var(--paper)" } : undefined}
                   type="button"
                 >
                   <span className="flex items-center justify-between font-bold capitalize">
