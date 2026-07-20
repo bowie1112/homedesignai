@@ -61,7 +61,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="flex flex-col gap-4 pt-7 text-xs text-[color:oklch(72%_0.02_84)] sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Home Design AI. Concept tool, not construction advice.</p>
+          <p>© {new Date().getFullYear()} Home Design AI.</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <a className="inline-flex items-center gap-1 hover:text-white" href={`mailto:${supportEmail}`}>
               {supportEmail} <ArrowUpRight size={13} />

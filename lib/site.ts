@@ -425,11 +425,6 @@ export const faqs = [
       "Use AI home design tools to redesign rooms, stage empty interiors, explore home exterior updates, plan garden and landscape directions, or turn an early sketch into a realistic concept image.",
   },
   {
-    question: "Is Home Design AI a replacement for an architect?",
-    answer:
-      "No. It is a fast concept and communication tool. Building, planning, safety, accessibility, and permit decisions should always be reviewed by qualified local professionals.",
-  },
-  {
     question: "What is the difference between Basic and Pro?",
     answer:
       "Basic uses Nano Banana 2 Lite. Registered users receive 3 free Basic generations each UTC day, then Basic costs 1 permanent credit. Pro uses Nano Banana 2 at a fixed 2K output and always costs 3 permanent credits.",
