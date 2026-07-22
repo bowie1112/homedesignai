@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const surfaceValues = ["generator", "history", "pricing", "auth", "system"] as const;
-const safePropertyKeys = new Set(["tool", "tier", "failure_stage", "plan_id", "status", "share_method", "error_code"]);
+const safePropertyKeys = new Set(["tool", "tier", "failure_stage", "plan_id", "pricing_version", "billing_mode", "status", "share_method", "error_code"]);
 
 const eventSchema = z.object({
   id: z.string().uuid(),

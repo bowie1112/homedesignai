@@ -11,8 +11,12 @@ export const productEventNames = [
   "result_delete_failed",
   "generation_client_failed",
   "insufficient_credits_seen",
+  "pricing_viewed",
+  "billing_mode_selected",
+  "plan_selected",
   "checkout_started",
   "checkout_redirected",
+  "checkout_completed",
   "checkout_failed",
 ] as const;
 

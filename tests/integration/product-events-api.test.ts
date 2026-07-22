@@ -57,4 +57,23 @@ describe("product events API", () => {
       properties: { tool: "interior-design-ai", tier: "pro", status: "success" },
     }), { onConflict: "id", ignoreDuplicates: true });
   });
+
+  it("keeps the v2 pricing dimensions for funnel events", async () => {
+    vi.mocked(createServerSupabaseClient).mockResolvedValue({ auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } } }) } } as never);
+    const upsert = vi.fn().mockResolvedValue({ error: null });
+    vi.mocked(createAdminClient).mockReturnValue({ from: vi.fn(() => ({ upsert })) } as never);
+
+    const pricingEvent = {
+      ...event,
+      generationJobId: undefined,
+      eventName: "billing_mode_selected",
+      surface: "pricing",
+      properties: { pricing_version: "v2", billing_mode: "yearly", ignored: "remove-me" },
+    };
+    expect((await POST(request(pricingEvent))).status).toBe(201);
+    expect(upsert).toHaveBeenCalledWith(expect.objectContaining({
+      event_name: "billing_mode_selected",
+      properties: { pricing_version: "v2", billing_mode: "yearly" },
+    }), { onConflict: "id", ignoreDuplicates: true });
+  });
 });

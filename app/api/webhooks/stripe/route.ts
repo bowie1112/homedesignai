@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "node:crypto";
 import Stripe from "stripe";
 import { creditsGrantedForPaidInvoice, getPaymentPlan, type PaymentPlanId } from "@/lib/payments/plans";
 import { getStripe, getStripeWebhookSecret } from "@/lib/stripe";
@@ -27,6 +28,28 @@ async function grantCredits(userId: string, amount: number, eventId: string, typ
   const admin = createAdminClient();
   const { error } = await admin.rpc("grant_credits", { p_user_id: userId, p_amount: amount, p_type: type, p_reference_id: `stripe:${eventId}` });
   if (error) throw new Error(`Stripe credits could not be granted: ${error.message}`);
+}
+
+function uuidForProductEvent(eventId: string) {
+  const hex = createHash("sha256").update(`product-event:${eventId}`).digest("hex").slice(0, 32);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
+
+async function recordCheckoutCompleted(userId: string, planId: string, status: string, eventId: string) {
+  const { error } = await createAdminClient().from("product_events").upsert({
+    id: uuidForProductEvent(eventId),
+    user_id: userId,
+    generation_job_id: null,
+    event_name: "checkout_completed",
+    surface: "pricing",
+    properties: {
+      plan_id: planId,
+      pricing_version: planId.endsWith("_v2") ? "v2" : "legacy",
+      status,
+    },
+    occurred_at: new Date().toISOString(),
+  }, { onConflict: "id", ignoreDuplicates: true });
+  if (error) throw new Error(`Checkout completion could not be recorded: ${error.message}`);
 }
 
 function stripeObjectId(value: string | { id: string } | null | undefined) {
@@ -72,6 +95,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, eventId
   if (plan.kind === "one_time" && session.payment_status === "paid") {
     await grantCredits(userId, plan.creditsPerInvoice, eventId, "purchase");
   }
+  if (session.payment_status !== "unpaid") await recordCheckoutCompleted(userId, plan.id, session.payment_status, eventId);
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice, eventId: string) {

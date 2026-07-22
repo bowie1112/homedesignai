@@ -2,8 +2,9 @@
 
 import { Check, MoveRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BillingButton } from "@/components/billing-button";
+import { trackGaEvent, trackProductEvent } from "@/lib/analytics";
 import {
   formatUsd,
   publicPaymentPlans,
@@ -41,6 +42,12 @@ function creditsLabel(plan: PublicPaymentPlan) {
   if (plan.billingMode === "yearly") return `${plan.creditsPerInvoice.toLocaleString("en-US")} credits granted annually`;
   if (plan.billingMode === "monthly") return `${plan.creditsPerInvoice.toLocaleString("en-US")} credits each month`;
   return `${plan.creditsPerInvoice.toLocaleString("en-US")} permanent credits`;
+}
+
+function generationLabel(plan: PublicPaymentPlan) {
+  const basic = plan.creditsPerInvoice.toLocaleString("en-US");
+  const pro = Math.floor(plan.creditsPerInvoice / 3).toLocaleString("en-US");
+  return `Up to ${basic} Basic or ${pro} Pro generations`;
 }
 
 function PricingCard({
@@ -81,7 +88,8 @@ function PricingCard({
       </div>
       {price.detail ? <p className="mt-2 text-xs font-semibold">{price.detail}</p> : null}
       <p className="mt-3 text-sm font-bold">{creditsLabel(plan)}</p>
-      {plan.billingMode === "yearly" ? <p className={`mt-1 text-xs font-bold ${highlighted ? "text-[color:oklch(89%_0.06_150)]" : "text-[var(--green)]"}`}>Save 50% vs monthly</p> : null}
+      <p className={`mt-1 text-xs ${highlighted ? "text-[color:oklch(93%_0.02_258)]" : compact ? "text-[var(--ink-soft)]" : "text-[color:oklch(78%_0.02_84)]"}`}>{generationLabel(plan)}</p>
+      {plan.billingMode === "yearly" ? <p className={`mt-1 text-xs font-bold ${highlighted ? "text-[color:oklch(89%_0.06_150)]" : "text-[var(--green)]"}`}>Save 20% vs monthly</p> : null}
       <div className={`my-6 h-px ${highlighted ? "bg-[color:oklch(100%_0_0/0.24)]" : compact ? "bg-[var(--line)]" : "bg-[color:oklch(74%_0.02_257/0.28)]"}`} />
       <p className="text-sm font-bold">What&apos;s included:</p>
       <ul className="mt-4 space-y-2.5">
@@ -122,6 +130,20 @@ export function PricingSection({ authenticated = false, compact = false }: { aut
   const [billingMode, setBillingMode] = useState<BillingMode>("monthly");
   const plans = publicPaymentPlans.filter((plan) => plan.billingMode === billingMode);
 
+  useEffect(() => {
+    const properties = { pricing_version: "v2", billing_mode: "monthly" };
+    if (authenticated) void trackProductEvent({ eventName: "pricing_viewed", surface: "pricing", properties });
+    else trackGaEvent("pricing_viewed", { ...properties, surface: "pricing" });
+  }, [authenticated]);
+
+  const selectBillingMode = (mode: BillingMode) => {
+    setBillingMode(mode);
+    if (mode === billingMode) return;
+    const properties = { pricing_version: "v2", billing_mode: mode };
+    if (authenticated) void trackProductEvent({ eventName: "billing_mode_selected", surface: "pricing", properties });
+    else trackGaEvent("billing_mode_selected", { ...properties, surface: "pricing" });
+  };
+
   return (
     <section className={compact ? "" : "content-auto bg-[var(--ink)] py-20 text-[var(--paper)] sm:py-28"} id="pricing">
       <div className={compact ? "" : "site-shell"}>
@@ -141,12 +163,12 @@ export function PricingSection({ authenticated = false, compact = false }: { aut
                     aria-selected={billingMode === mode.id}
                     className={`min-h-10 px-4 text-sm font-bold transition-colors sm:px-5 ${billingMode === mode.id ? "bg-[var(--blue)] text-white" : compact ? "text-[var(--ink-soft)] hover:text-[var(--ink)]" : "text-[color:oklch(79%_0.02_84)] hover:text-white"}`}
                     key={mode.id}
-                    onClick={() => setBillingMode(mode.id)}
+                    onClick={() => selectBillingMode(mode.id)}
                     role="tab"
                     type="button"
                   >
                     {mode.label}
-                    {mode.id === "yearly" ? <span className={`ml-2 text-[10px] uppercase ${billingMode === mode.id ? "text-[color:oklch(91%_0.05_150)]" : "text-[var(--green)]"}`}>Save 50%</span> : null}
+                    {mode.id === "yearly" ? <span className={`ml-2 text-[10px] uppercase ${billingMode === mode.id ? "text-[color:oklch(91%_0.05_150)]" : "text-[var(--green)]"}`}>Save 20%</span> : null}
                   </button>
                 ))}
               </div>
@@ -154,6 +176,9 @@ export function PricingSection({ authenticated = false, compact = false }: { aut
             <div className="grid gap-px bg-[color:oklch(74%_0.02_257/0.35)] md:grid-cols-3" role="tabpanel">
               {plans.map((plan) => <PricingCard authenticated={authenticated} compact={compact} key={plan.id} plan={plan} />)}
             </div>
+            <p className={`mt-5 text-xs leading-5 ${compact ? "text-[var(--ink-soft)]" : "text-[color:oklch(79%_0.02_84)]"}`}>
+              Basic uses 1 credit for a 1K image. Pro uses 3 credits for a 2K image. Mix both models whenever you need them.
+            </p>
           </div>
         </div>
       </div>

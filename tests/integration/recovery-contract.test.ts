@@ -42,6 +42,9 @@ describe("durable recovery integration contracts", () => {
     expect(stripeWebhook).toContain('session.payment_status === "paid"');
     expect(stripeWebhook).toContain('"subscription"');
     expect(stripeWebhook).toContain("subscription.metadata.planId");
+    expect(stripeWebhook).toContain("recordCheckoutCompleted");
+    expect(stripeWebhook).toContain('event_name: "checkout_completed"');
+    expect(stripeWebhook).toContain("uuidForProductEvent(eventId)");
     expect(stripeWebhook).not.toContain("findSubscriptionProductByPrice");
   });
 
@@ -50,6 +53,8 @@ describe("durable recovery integration contracts", () => {
     expect(checkout).toContain("unit_amount: plan.amount");
     expect(checkout).toContain("recurring: { interval: plan.interval }");
     expect(checkout).toContain("allow_promotion_codes: true");
+    expect(checkout).toContain("z.enum(publicPaymentPlanIds)");
+    expect(checkout).toContain('pricingVersion: "v2"');
     expect(checkout).toContain("z.object({ planId:");
     expect(checkout).not.toContain("priceEnv");
     expect(plans).toContain("creditsPerInvoice");

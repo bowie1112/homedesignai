@@ -26,13 +26,16 @@ export function BillingButton({
   const checkout = async () => {
     const returnPath = `/pricing?plan=${encodeURIComponent(planId)}`;
     const signInPath = `/auth/sign-in?next=${encodeURIComponent(returnPath)}`;
+    const properties = { plan_id: planId, pricing_version: "v2" };
     if (!authenticated) {
-      trackGaEvent("checkout_started", { plan_id: planId, surface: "pricing" });
+      trackGaEvent("plan_selected", { ...properties, surface: "pricing" });
+      trackGaEvent("checkout_started", { ...properties, surface: "pricing" });
       window.location.assign(signInPath);
       return;
     }
 
-    void trackProductEvent({ eventName: "checkout_started", surface: "pricing", properties: { plan_id: planId } });
+    void trackProductEvent({ eventName: "plan_selected", surface: "pricing", properties });
+    void trackProductEvent({ eventName: "checkout_started", surface: "pricing", properties });
     setLoading(true);
     setError(null);
     try {
@@ -47,11 +50,11 @@ export function BillingButton({
         return;
       }
       if (!response.ok || !payload.url) throw new Error(payload.message ?? "Checkout is not available yet.");
-      await trackProductEvent({ eventName: "checkout_redirected", surface: "pricing", properties: { plan_id: planId } });
+      await trackProductEvent({ eventName: "checkout_redirected", surface: "pricing", properties });
       window.location.assign(payload.url);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Checkout is not available yet.");
-      void trackProductEvent({ eventName: "checkout_failed", surface: "pricing", properties: { plan_id: planId } });
+      void trackProductEvent({ eventName: "checkout_failed", surface: "pricing", properties });
       setLoading(false);
     }
   };

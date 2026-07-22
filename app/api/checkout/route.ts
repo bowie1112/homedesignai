@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { z } from "zod";
 import { getAppUrl, ConfigurationError } from "@/lib/env";
-import { paymentPlanIds, paymentPlans } from "@/lib/payments/plans";
+import { paymentPlans, publicPaymentPlanIds } from "@/lib/payments/plans";
 import { getStripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-const requestSchema = z.object({ planId: z.enum(paymentPlanIds) }).strict();
+const requestSchema = z.object({ planId: z.enum(publicPaymentPlanIds) }).strict();
 
 export async function POST(request: NextRequest) {
   let orderId: string | null = null;
@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       email: user.email ?? "",
       planId,
+      pricingVersion: "v2",
       credits: String(plan.creditsPerInvoice),
       kind: plan.kind,
     };
