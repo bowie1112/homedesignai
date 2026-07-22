@@ -207,8 +207,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-label="Featured on There's An AI For That" className="border-t border-[var(--line)] bg-[var(--white)] py-8">
-        <div className="site-shell flex justify-center sm:justify-start">
+      <section aria-label="Featured directories" className="border-t border-[var(--line)] bg-[var(--white)] py-8">
+        <div className="site-shell flex flex-wrap items-center justify-center gap-5 sm:justify-start">
           <a
             href="https://theresanaiforthat.com/ai/home-design-ai-1784108411/?ref=featured&v=9177459"
             rel="nofollow noopener noreferrer"
@@ -222,6 +222,23 @@ export default function HomePage() {
               loading="lazy"
               src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600"
               width="300"
+            />
+          </a>
+          <a
+            href="https://aiagentsdirectory.com/agent/ai-home-design"
+            rel="noopener"
+            target="_blank"
+            title="Discover AI Home Design on AI Agents Directory"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt="AI Home Design - Featured on AI Agents Directory"
+              className="h-auto max-w-full"
+              decoding="async"
+              loading="lazy"
+              src="https://aiagentsdirectory.com/featured-badge.svg?v=2024"
+              width="200"
+              height="50"
             />
           </a>
         </div>
